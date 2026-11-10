@@ -5,8 +5,8 @@ Index Scan using doctors_registration_no_key on doctors  (cost=0.28..8.30 rows=1
   Buffers: shared hit=3
 Planning:
   Buffers: shared hit=93
-Planning Time: 0.200 ms
-Execution Time: 0.024 ms
+Planning Time: 0.163 ms
+Execution Time: 0.023 ms
 === R23 run 2 ===
 Index Scan using doctors_registration_no_key on doctors  (cost=0.28..8.30 rows=1 width=25) (actual time=0.008..0.008 rows=1.00 loops=1)
   Index Cond: ((registration_no)::text = 'TSMC-011519'::text)
@@ -14,14 +14,14 @@ Index Scan using doctors_registration_no_key on doctors  (cost=0.28..8.30 rows=1
   Buffers: shared hit=3
 Planning:
   Buffers: shared hit=93
-Planning Time: 0.179 ms
+Planning Time: 0.165 ms
 Execution Time: 0.024 ms
 === R23 run 3 ===
-Index Scan using doctors_registration_no_key on doctors  (cost=0.28..8.30 rows=1 width=25) (actual time=0.008..0.008 rows=1.00 loops=1)
+Index Scan using doctors_registration_no_key on doctors  (cost=0.28..8.30 rows=1 width=25) (actual time=0.007..0.007 rows=1.00 loops=1)
   Index Cond: ((registration_no)::text = 'TSMC-011519'::text)
   Index Searches: 1
   Buffers: shared hit=3
 Planning:
   Buffers: shared hit=93
-Planning Time: 0.180 ms
-Execution Time: 0.024 ms
+Planning Time: 0.171 ms
+Execution Time: 0.023 ms
