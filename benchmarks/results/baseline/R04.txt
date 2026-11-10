@@ -1,0 +1,75 @@
+=== R04 run 1 ===
+Sort  (cost=5033.06..5033.07 rows=1 width=63) (actual time=7.077..7.078 rows=2.00 loops=1)
+  Sort Key: a.slot_start
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=2755
+  ->  Nested Loop Left Join  (cost=0.28..5033.05 rows=1 width=63) (actual time=6.811..7.069 rows=2.00 loops=1)
+        Join Filter: (c.clinic_id = a.clinic_id)
+        Rows Removed by Join Filter: 1703
+        Buffers: shared hit=2752
+        ->  Nested Loop  (cost=0.28..4978.30 rows=1 width=41) (actual time=6.785..6.960 rows=2.00 loops=1)
+              Buffers: shared hit=2726
+              ->  Seq Scan on appointments a  (cost=0.00..4970.00 rows=1 width=29) (actual time=6.779..6.951 rows=2.00 loops=1)
+                    Filter: ((patient_id = 90) AND ((status)::text = 'BOOKED'::text))
+                    Rows Removed by Filter: 149998
+                    Buffers: shared hit=2720
+              ->  Index Scan using doctors_pkey on doctors d  (cost=0.28..8.30 rows=1 width=20) (actual time=0.004..0.004 rows=1.00 loops=2)
+                    Index Cond: (doctor_id = a.doctor_id)
+                    Index Searches: 2
+                    Buffers: shared hit=6
+        ->  Seq Scan on clinics c  (cost=0.00..36.00 rows=1500 width=30) (actual time=0.003..0.030 rows=852.50 loops=2)
+              Buffers: shared hit=26
+Planning:
+  Buffers: shared hit=289
+Planning Time: 0.455 ms
+Execution Time: 7.104 ms
+=== R04 run 2 ===
+Sort  (cost=5033.06..5033.07 rows=1 width=63) (actual time=7.316..7.317 rows=2.00 loops=1)
+  Sort Key: a.slot_start
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=2755
+  ->  Nested Loop Left Join  (cost=0.28..5033.05 rows=1 width=63) (actual time=7.077..7.308 rows=2.00 loops=1)
+        Join Filter: (c.clinic_id = a.clinic_id)
+        Rows Removed by Join Filter: 1703
+        Buffers: shared hit=2752
+        ->  Nested Loop  (cost=0.28..4978.30 rows=1 width=41) (actual time=7.051..7.211 rows=2.00 loops=1)
+              Buffers: shared hit=2726
+              ->  Seq Scan on appointments a  (cost=0.00..4970.00 rows=1 width=29) (actual time=7.046..7.201 rows=2.00 loops=1)
+                    Filter: ((patient_id = 90) AND ((status)::text = 'BOOKED'::text))
+                    Rows Removed by Filter: 149998
+                    Buffers: shared hit=2720
+              ->  Index Scan using doctors_pkey on doctors d  (cost=0.28..8.30 rows=1 width=20) (actual time=0.004..0.004 rows=1.00 loops=2)
+                    Index Cond: (doctor_id = a.doctor_id)
+                    Index Searches: 2
+                    Buffers: shared hit=6
+        ->  Seq Scan on clinics c  (cost=0.00..36.00 rows=1500 width=30) (actual time=0.003..0.027 rows=852.50 loops=2)
+              Buffers: shared hit=26
+Planning:
+  Buffers: shared hit=289
+Planning Time: 0.507 ms
+Execution Time: 7.341 ms
+=== R04 run 3 ===
+Sort  (cost=5033.06..5033.07 rows=1 width=63) (actual time=6.998..6.999 rows=2.00 loops=1)
+  Sort Key: a.slot_start
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=2755
+  ->  Nested Loop Left Join  (cost=0.28..5033.05 rows=1 width=63) (actual time=6.761..6.990 rows=2.00 loops=1)
+        Join Filter: (c.clinic_id = a.clinic_id)
+        Rows Removed by Join Filter: 1703
+        Buffers: shared hit=2752
+        ->  Nested Loop  (cost=0.28..4978.30 rows=1 width=41) (actual time=6.738..6.897 rows=2.00 loops=1)
+              Buffers: shared hit=2726
+              ->  Seq Scan on appointments a  (cost=0.00..4970.00 rows=1 width=29) (actual time=6.734..6.889 rows=2.00 loops=1)
+                    Filter: ((patient_id = 90) AND ((status)::text = 'BOOKED'::text))
+                    Rows Removed by Filter: 149998
+                    Buffers: shared hit=2720
+              ->  Index Scan using doctors_pkey on doctors d  (cost=0.28..8.30 rows=1 width=20) (actual time=0.003..0.003 rows=1.00 loops=2)
+                    Index Cond: (doctor_id = a.doctor_id)
+                    Index Searches: 2
+                    Buffers: shared hit=6
+        ->  Seq Scan on clinics c  (cost=0.00..36.00 rows=1500 width=30) (actual time=0.002..0.023 rows=852.50 loops=2)
+              Buffers: shared hit=26
+Planning:
+  Buffers: shared hit=289
+Planning Time: 0.476 ms
+Execution Time: 7.026 ms
