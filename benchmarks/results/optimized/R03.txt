@@ -1,0 +1,125 @@
+=== R03 run 1 ===
+Merge Anti Join  (cost=154.43..193.32 rows=1995 width=8) (actual time=0.117..0.118 rows=12.00 loops=1)
+  Merge Cond: (slot.slot = a.slot_start)
+  Buffers: shared hit=13 dirtied=1
+  ->  Sort  (cost=154.01..159.01 rows=2000 width=8) (actual time=0.046..0.046 rows=12.00 loops=1)
+        Sort Key: slot.slot
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=3
+        ->  Nested Loop  (cost=0.31..44.35 rows=2000 width=8) (actual time=0.041..0.042 rows=12.00 loops=1)
+              Buffers: shared hit=3
+              ->  Index Only Scan using idx_schedules_inclinic_doctor_weekday_start on doctor_schedules sc  (cost=0.29..4.33 rows=2 width=20) (actual time=0.032..0.032 rows=1.00 loops=1)
+                    Index Cond: ((doctor_id = 217) AND (weekday = 5))
+                    Heap Fetches: 0
+                    Index Searches: 1
+                    Buffers: shared hit=3
+              ->  Function Scan on generate_series slot  (cost=0.02..10.03 rows=1000 width=8) (actual time=0.008..0.009 rows=12.00 loops=1)
+  ->  Index Only Scan using idx_appointments_active_doctor_slot on appointments a  (cost=0.42..29.15 rows=42 width=8) (actual time=0.042..0.067 rows=72.00 loops=1)
+        Index Cond: (doctor_id = 217)
+        Heap Fetches: 6
+        Index Searches: 1
+        Buffers: shared hit=10 dirtied=1
+Planning:
+  Buffers: shared hit=631
+Planning Time: 0.933 ms
+Execution Time: 0.142 ms
+=== R03 run 2 ===
+Merge Anti Join  (cost=154.43..193.32 rows=1995 width=8) (actual time=0.095..0.097 rows=12.00 loops=1)
+  Merge Cond: (slot.slot = a.slot_start)
+  Buffers: shared hit=12
+  ->  Sort  (cost=154.01..159.01 rows=2000 width=8) (actual time=0.049..0.049 rows=12.00 loops=1)
+        Sort Key: slot.slot
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=3
+        ->  Nested Loop  (cost=0.31..44.35 rows=2000 width=8) (actual time=0.044..0.045 rows=12.00 loops=1)
+              Buffers: shared hit=3
+              ->  Index Only Scan using idx_schedules_inclinic_doctor_weekday_start on doctor_schedules sc  (cost=0.29..4.33 rows=2 width=20) (actual time=0.035..0.035 rows=1.00 loops=1)
+                    Index Cond: ((doctor_id = 217) AND (weekday = 5))
+                    Heap Fetches: 0
+                    Index Searches: 1
+                    Buffers: shared hit=3
+              ->  Function Scan on generate_series slot  (cost=0.02..10.03 rows=1000 width=8) (actual time=0.008..0.008 rows=12.00 loops=1)
+  ->  Index Only Scan using idx_appointments_active_doctor_slot on appointments a  (cost=0.42..29.15 rows=42 width=8) (actual time=0.033..0.043 rows=72.00 loops=1)
+        Index Cond: (doctor_id = 217)
+        Heap Fetches: 5
+        Index Searches: 1
+        Buffers: shared hit=9
+Planning:
+  Buffers: shared hit=631
+Planning Time: 0.943 ms
+Execution Time: 0.119 ms
+=== R03 run 3 ===
+Merge Anti Join  (cost=154.43..193.32 rows=1995 width=8) (actual time=0.083..0.084 rows=12.00 loops=1)
+  Merge Cond: (slot.slot = a.slot_start)
+  Buffers: shared hit=12
+  ->  Sort  (cost=154.01..159.01 rows=2000 width=8) (actual time=0.042..0.042 rows=12.00 loops=1)
+        Sort Key: slot.slot
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=3
+        ->  Nested Loop  (cost=0.31..44.35 rows=2000 width=8) (actual time=0.037..0.038 rows=12.00 loops=1)
+              Buffers: shared hit=3
+              ->  Index Only Scan using idx_schedules_inclinic_doctor_weekday_start on doctor_schedules sc  (cost=0.29..4.33 rows=2 width=20) (actual time=0.028..0.028 rows=1.00 loops=1)
+                    Index Cond: ((doctor_id = 217) AND (weekday = 5))
+                    Heap Fetches: 0
+                    Index Searches: 1
+                    Buffers: shared hit=3
+              ->  Function Scan on generate_series slot  (cost=0.02..10.03 rows=1000 width=8) (actual time=0.008..0.008 rows=12.00 loops=1)
+  ->  Index Only Scan using idx_appointments_active_doctor_slot on appointments a  (cost=0.42..29.15 rows=42 width=8) (actual time=0.027..0.038 rows=72.00 loops=1)
+        Index Cond: (doctor_id = 217)
+        Heap Fetches: 5
+        Index Searches: 1
+        Buffers: shared hit=9
+Planning:
+  Buffers: shared hit=631
+Planning Time: 0.852 ms
+Execution Time: 0.107 ms
+=== R03 run 4 ===
+Merge Anti Join  (cost=154.43..193.32 rows=1995 width=8) (actual time=0.096..0.097 rows=12.00 loops=1)
+  Merge Cond: (slot.slot = a.slot_start)
+  Buffers: shared hit=12
+  ->  Sort  (cost=154.01..159.01 rows=2000 width=8) (actual time=0.044..0.044 rows=12.00 loops=1)
+        Sort Key: slot.slot
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=3
+        ->  Nested Loop  (cost=0.31..44.35 rows=2000 width=8) (actual time=0.039..0.040 rows=12.00 loops=1)
+              Buffers: shared hit=3
+              ->  Index Only Scan using idx_schedules_inclinic_doctor_weekday_start on doctor_schedules sc  (cost=0.29..4.33 rows=2 width=20) (actual time=0.031..0.031 rows=1.00 loops=1)
+                    Index Cond: ((doctor_id = 217) AND (weekday = 5))
+                    Heap Fetches: 0
+                    Index Searches: 1
+                    Buffers: shared hit=3
+              ->  Function Scan on generate_series slot  (cost=0.02..10.03 rows=1000 width=8) (actual time=0.007..0.007 rows=12.00 loops=1)
+  ->  Index Only Scan using idx_appointments_active_doctor_slot on appointments a  (cost=0.42..29.15 rows=42 width=8) (actual time=0.038..0.049 rows=72.00 loops=1)
+        Index Cond: (doctor_id = 217)
+        Heap Fetches: 5
+        Index Searches: 1
+        Buffers: shared hit=9
+Planning:
+  Buffers: shared hit=631
+Planning Time: 0.826 ms
+Execution Time: 0.120 ms
+=== R03 run 5 ===
+Merge Anti Join  (cost=154.43..193.32 rows=1995 width=8) (actual time=0.080..0.081 rows=12.00 loops=1)
+  Merge Cond: (slot.slot = a.slot_start)
+  Buffers: shared hit=12
+  ->  Sort  (cost=154.01..159.01 rows=2000 width=8) (actual time=0.041..0.041 rows=12.00 loops=1)
+        Sort Key: slot.slot
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=3
+        ->  Nested Loop  (cost=0.31..44.35 rows=2000 width=8) (actual time=0.036..0.037 rows=12.00 loops=1)
+              Buffers: shared hit=3
+              ->  Index Only Scan using idx_schedules_inclinic_doctor_weekday_start on doctor_schedules sc  (cost=0.29..4.33 rows=2 width=20) (actual time=0.028..0.029 rows=1.00 loops=1)
+                    Index Cond: ((doctor_id = 217) AND (weekday = 5))
+                    Heap Fetches: 0
+                    Index Searches: 1
+                    Buffers: shared hit=3
+              ->  Function Scan on generate_series slot  (cost=0.02..10.03 rows=1000 width=8) (actual time=0.007..0.007 rows=12.00 loops=1)
+  ->  Index Only Scan using idx_appointments_active_doctor_slot on appointments a  (cost=0.42..29.15 rows=42 width=8) (actual time=0.026..0.036 rows=72.00 loops=1)
+        Index Cond: (doctor_id = 217)
+        Heap Fetches: 5
+        Index Searches: 1
+        Buffers: shared hit=9
+Planning:
+  Buffers: shared hit=631
+Planning Time: 0.797 ms
+Execution Time: 0.103 ms

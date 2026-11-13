@@ -1,0 +1,115 @@
+=== R11 run 1 ===
+Nested Loop Anti Join  (cost=1.13..4186.63 rows=310 width=16) (actual time=0.025..1.455 rows=430.00 loops=1)
+  Buffers: shared hit=4487 dirtied=33
+  ->  Nested Loop  (cost=0.71..3789.55 rows=465 width=24) (actual time=0.015..0.481 rows=430.00 loops=1)
+        Buffers: shared hit=1990
+        ->  Index Scan using idx_prescriptions_follow_up_date on prescriptions p  (cost=0.29..674.11 rows=465 width=12) (actual time=0.010..0.119 rows=430.00 loops=1)
+              Index Cond: ((follow_up_date >= '2026-07-01'::date) AND (follow_up_date <= '2026-07-07'::date))
+              Index Searches: 1
+              Buffers: shared hit=270
+        ->  Index Scan using appointments_pkey on appointments a  (cost=0.42..6.70 rows=1 width=20) (actual time=0.001..0.001 rows=1.00 loops=430)
+              Index Cond: (appointment_id = p.appointment_id)
+              Index Searches: 430
+              Buffers: shared hit=1720
+  ->  Index Scan using idx_appointments_active_doctor_slot on appointments f  (cost=0.42..0.84 rows=1 width=16) (actual time=0.002..0.002 rows=0.00 loops=430)
+        Index Cond: ((doctor_id = a.doctor_id) AND (slot_start > a.slot_start))
+        Filter: (patient_id = a.patient_id)
+        Rows Removed by Filter: 3
+        Index Searches: 430
+        Buffers: shared hit=2497 dirtied=33
+Planning:
+  Buffers: shared hit=687
+Planning Time: 0.910 ms
+Execution Time: 1.480 ms
+=== R11 run 2 ===
+Nested Loop Anti Join  (cost=1.13..4186.63 rows=310 width=16) (actual time=0.024..1.255 rows=430.00 loops=1)
+  Buffers: shared hit=4420
+  ->  Nested Loop  (cost=0.71..3789.55 rows=465 width=24) (actual time=0.015..0.463 rows=430.00 loops=1)
+        Buffers: shared hit=1990
+        ->  Index Scan using idx_prescriptions_follow_up_date on prescriptions p  (cost=0.29..674.11 rows=465 width=12) (actual time=0.010..0.112 rows=430.00 loops=1)
+              Index Cond: ((follow_up_date >= '2026-07-01'::date) AND (follow_up_date <= '2026-07-07'::date))
+              Index Searches: 1
+              Buffers: shared hit=270
+        ->  Index Scan using appointments_pkey on appointments a  (cost=0.42..6.70 rows=1 width=20) (actual time=0.001..0.001 rows=1.00 loops=430)
+              Index Cond: (appointment_id = p.appointment_id)
+              Index Searches: 430
+              Buffers: shared hit=1720
+  ->  Index Scan using idx_appointments_active_doctor_slot on appointments f  (cost=0.42..0.84 rows=1 width=16) (actual time=0.002..0.002 rows=0.00 loops=430)
+        Index Cond: ((doctor_id = a.doctor_id) AND (slot_start > a.slot_start))
+        Filter: (patient_id = a.patient_id)
+        Rows Removed by Filter: 3
+        Index Searches: 430
+        Buffers: shared hit=2430
+Planning:
+  Buffers: shared hit=687
+Planning Time: 0.865 ms
+Execution Time: 1.278 ms
+=== R11 run 3 ===
+Nested Loop Anti Join  (cost=1.13..4186.63 rows=310 width=16) (actual time=0.023..1.218 rows=430.00 loops=1)
+  Buffers: shared hit=4420
+  ->  Nested Loop  (cost=0.71..3789.55 rows=465 width=24) (actual time=0.014..0.444 rows=430.00 loops=1)
+        Buffers: shared hit=1990
+        ->  Index Scan using idx_prescriptions_follow_up_date on prescriptions p  (cost=0.29..674.11 rows=465 width=12) (actual time=0.010..0.110 rows=430.00 loops=1)
+              Index Cond: ((follow_up_date >= '2026-07-01'::date) AND (follow_up_date <= '2026-07-07'::date))
+              Index Searches: 1
+              Buffers: shared hit=270
+        ->  Index Scan using appointments_pkey on appointments a  (cost=0.42..6.70 rows=1 width=20) (actual time=0.001..0.001 rows=1.00 loops=430)
+              Index Cond: (appointment_id = p.appointment_id)
+              Index Searches: 430
+              Buffers: shared hit=1720
+  ->  Index Scan using idx_appointments_active_doctor_slot on appointments f  (cost=0.42..0.84 rows=1 width=16) (actual time=0.002..0.002 rows=0.00 loops=430)
+        Index Cond: ((doctor_id = a.doctor_id) AND (slot_start > a.slot_start))
+        Filter: (patient_id = a.patient_id)
+        Rows Removed by Filter: 3
+        Index Searches: 430
+        Buffers: shared hit=2430
+Planning:
+  Buffers: shared hit=687
+Planning Time: 0.830 ms
+Execution Time: 1.239 ms
+=== R11 run 4 ===
+Nested Loop Anti Join  (cost=1.13..4186.63 rows=310 width=16) (actual time=0.023..1.206 rows=430.00 loops=1)
+  Buffers: shared hit=4420
+  ->  Nested Loop  (cost=0.71..3789.55 rows=465 width=24) (actual time=0.014..0.440 rows=430.00 loops=1)
+        Buffers: shared hit=1990
+        ->  Index Scan using idx_prescriptions_follow_up_date on prescriptions p  (cost=0.29..674.11 rows=465 width=12) (actual time=0.009..0.109 rows=430.00 loops=1)
+              Index Cond: ((follow_up_date >= '2026-07-01'::date) AND (follow_up_date <= '2026-07-07'::date))
+              Index Searches: 1
+              Buffers: shared hit=270
+        ->  Index Scan using appointments_pkey on appointments a  (cost=0.42..6.70 rows=1 width=20) (actual time=0.001..0.001 rows=1.00 loops=430)
+              Index Cond: (appointment_id = p.appointment_id)
+              Index Searches: 430
+              Buffers: shared hit=1720
+  ->  Index Scan using idx_appointments_active_doctor_slot on appointments f  (cost=0.42..0.84 rows=1 width=16) (actual time=0.002..0.002 rows=0.00 loops=430)
+        Index Cond: ((doctor_id = a.doctor_id) AND (slot_start > a.slot_start))
+        Filter: (patient_id = a.patient_id)
+        Rows Removed by Filter: 3
+        Index Searches: 430
+        Buffers: shared hit=2430
+Planning:
+  Buffers: shared hit=687
+Planning Time: 0.893 ms
+Execution Time: 1.229 ms
+=== R11 run 5 ===
+Nested Loop Anti Join  (cost=1.13..4186.63 rows=310 width=16) (actual time=0.022..1.176 rows=430.00 loops=1)
+  Buffers: shared hit=4420
+  ->  Nested Loop  (cost=0.71..3789.55 rows=465 width=24) (actual time=0.014..0.431 rows=430.00 loops=1)
+        Buffers: shared hit=1990
+        ->  Index Scan using idx_prescriptions_follow_up_date on prescriptions p  (cost=0.29..674.11 rows=465 width=12) (actual time=0.009..0.107 rows=430.00 loops=1)
+              Index Cond: ((follow_up_date >= '2026-07-01'::date) AND (follow_up_date <= '2026-07-07'::date))
+              Index Searches: 1
+              Buffers: shared hit=270
+        ->  Index Scan using appointments_pkey on appointments a  (cost=0.42..6.70 rows=1 width=20) (actual time=0.001..0.001 rows=1.00 loops=430)
+              Index Cond: (appointment_id = p.appointment_id)
+              Index Searches: 430
+              Buffers: shared hit=1720
+  ->  Index Scan using idx_appointments_active_doctor_slot on appointments f  (cost=0.42..0.84 rows=1 width=16) (actual time=0.002..0.002 rows=0.00 loops=430)
+        Index Cond: ((doctor_id = a.doctor_id) AND (slot_start > a.slot_start))
+        Filter: (patient_id = a.patient_id)
+        Rows Removed by Filter: 3
+        Index Searches: 430
+        Buffers: shared hit=2430
+Planning:
+  Buffers: shared hit=687
+Planning Time: 0.802 ms
+Execution Time: 1.198 ms

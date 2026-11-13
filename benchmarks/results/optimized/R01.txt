@@ -1,0 +1,200 @@
+=== R01 run 1 ===
+Limit  (cost=1.26..192.18 rows=20 width=29) (actual time=0.229..3.553 rows=20.00 loops=1)
+  Buffers: shared hit=7177
+  ->  Nested Loop Semi Join  (cost=1.26..2139.55 rows=224 width=29) (actual time=0.228..3.550 rows=20.00 loops=1)
+        Buffers: shared hit=7177
+        ->  Nested Loop Semi Join  (cost=0.70..1496.60 rows=224 width=33) (actual time=0.033..2.544 rows=99.00 loops=1)
+              Buffers: shared hit=5475
+              ->  Index Only Scan using idx_doctors_verified_experience on doctors d  (cost=0.28..117.01 rows=2715 width=29) (actual time=0.011..0.112 rows=1237.00 loops=1)
+                    Heap Fetches: 0
+                    Index Searches: 1
+                    Buffers: shared hit=10
+              ->  Nested Loop  (cost=0.42..0.50 rows=1 width=4) (actual time=0.002..0.002 rows=0.08 loops=1237)
+                    Buffers: shared hit=5465
+                    ->  Index Only Scan using pk_doctor_specializations on doctor_specializations ds  (cost=0.28..0.32 rows=1 width=8) (actual time=0.001..0.001 rows=1.21 loops=1237)
+                          Index Cond: (doctor_id = d.doctor_id)
+                          Heap Fetches: 0
+                          Index Searches: 1237
+                          Buffers: shared hit=2475
+                    ->  Index Scan using specializations_pkey on specializations s  (cost=0.14..0.16 rows=1 width=4) (actual time=0.001..0.001 rows=0.07 loops=1495)
+                          Index Cond: (spec_id = ds.spec_id)
+                          Filter: ((spec_name)::text = 'Dermatologist'::text)
+                          Rows Removed by Filter: 1
+                          Index Searches: 1495
+                          Buffers: shared hit=2990
+        ->  Nested Loop  (cost=0.56..3.58 rows=2 width=4) (actual time=0.010..0.010 rows=0.20 loops=99)
+              Buffers: shared hit=1702
+              ->  Index Only Scan using idx_schedules_inclinic_doctor_weekday_start on doctor_schedules sc  (cost=0.29..0.59 rows=10 width=8) (actual time=0.003..0.003 rows=7.57 loops=99)
+                    Index Cond: (doctor_id = ds.doctor_id)
+                    Heap Fetches: 0
+                    Index Searches: 99
+                    Buffers: shared hit=203
+              ->  Index Only Scan using idx_clinics_city_clinic on clinics c  (cost=0.28..0.30 rows=1 width=4) (actual time=0.001..0.001 rows=0.03 loops=749)
+                    Index Cond: ((city_id = 1) AND (clinic_id = sc.clinic_id))
+                    Heap Fetches: 0
+                    Index Searches: 749
+                    Buffers: shared hit=1499
+Planning:
+  Buffers: shared hit=445
+Planning Time: 2.772 ms
+Execution Time: 3.605 ms
+=== R01 run 2 ===
+Limit  (cost=1.26..192.18 rows=20 width=29) (actual time=0.178..2.019 rows=20.00 loops=1)
+  Buffers: shared hit=7177
+  ->  Nested Loop Semi Join  (cost=1.26..2139.55 rows=224 width=29) (actual time=0.177..2.018 rows=20.00 loops=1)
+        Buffers: shared hit=7177
+        ->  Nested Loop Semi Join  (cost=0.70..1496.60 rows=224 width=33) (actual time=0.026..1.432 rows=99.00 loops=1)
+              Buffers: shared hit=5475
+              ->  Index Only Scan using idx_doctors_verified_experience on doctors d  (cost=0.28..117.01 rows=2715 width=29) (actual time=0.009..0.066 rows=1237.00 loops=1)
+                    Heap Fetches: 0
+                    Index Searches: 1
+                    Buffers: shared hit=10
+              ->  Nested Loop  (cost=0.42..0.50 rows=1 width=4) (actual time=0.001..0.001 rows=0.08 loops=1237)
+                    Buffers: shared hit=5465
+                    ->  Index Only Scan using pk_doctor_specializations on doctor_specializations ds  (cost=0.28..0.32 rows=1 width=8) (actual time=0.000..0.000 rows=1.21 loops=1237)
+                          Index Cond: (doctor_id = d.doctor_id)
+                          Heap Fetches: 0
+                          Index Searches: 1237
+                          Buffers: shared hit=2475
+                    ->  Index Scan using specializations_pkey on specializations s  (cost=0.14..0.16 rows=1 width=4) (actual time=0.000..0.000 rows=0.07 loops=1495)
+                          Index Cond: (spec_id = ds.spec_id)
+                          Filter: ((spec_name)::text = 'Dermatologist'::text)
+                          Rows Removed by Filter: 1
+                          Index Searches: 1495
+                          Buffers: shared hit=2990
+        ->  Nested Loop  (cost=0.56..3.58 rows=2 width=4) (actual time=0.006..0.006 rows=0.20 loops=99)
+              Buffers: shared hit=1702
+              ->  Index Only Scan using idx_schedules_inclinic_doctor_weekday_start on doctor_schedules sc  (cost=0.29..0.59 rows=10 width=8) (actual time=0.002..0.002 rows=7.57 loops=99)
+                    Index Cond: (doctor_id = ds.doctor_id)
+                    Heap Fetches: 0
+                    Index Searches: 99
+                    Buffers: shared hit=203
+              ->  Index Only Scan using idx_clinics_city_clinic on clinics c  (cost=0.28..0.30 rows=1 width=4) (actual time=0.000..0.000 rows=0.03 loops=749)
+                    Index Cond: ((city_id = 1) AND (clinic_id = sc.clinic_id))
+                    Heap Fetches: 0
+                    Index Searches: 749
+                    Buffers: shared hit=1499
+Planning:
+  Buffers: shared hit=445
+Planning Time: 1.906 ms
+Execution Time: 2.062 ms
+=== R01 run 3 ===
+Limit  (cost=1.26..192.18 rows=20 width=29) (actual time=0.150..2.352 rows=20.00 loops=1)
+  Buffers: shared hit=7177
+  ->  Nested Loop Semi Join  (cost=1.26..2139.55 rows=224 width=29) (actual time=0.150..2.350 rows=20.00 loops=1)
+        Buffers: shared hit=7177
+        ->  Nested Loop Semi Join  (cost=0.70..1496.60 rows=224 width=33) (actual time=0.021..1.671 rows=99.00 loops=1)
+              Buffers: shared hit=5475
+              ->  Index Only Scan using idx_doctors_verified_experience on doctors d  (cost=0.28..117.01 rows=2715 width=29) (actual time=0.007..0.075 rows=1237.00 loops=1)
+                    Heap Fetches: 0
+                    Index Searches: 1
+                    Buffers: shared hit=10
+              ->  Nested Loop  (cost=0.42..0.50 rows=1 width=4) (actual time=0.001..0.001 rows=0.08 loops=1237)
+                    Buffers: shared hit=5465
+                    ->  Index Only Scan using pk_doctor_specializations on doctor_specializations ds  (cost=0.28..0.32 rows=1 width=8) (actual time=0.000..0.001 rows=1.21 loops=1237)
+                          Index Cond: (doctor_id = d.doctor_id)
+                          Heap Fetches: 0
+                          Index Searches: 1237
+                          Buffers: shared hit=2475
+                    ->  Index Scan using specializations_pkey on specializations s  (cost=0.14..0.16 rows=1 width=4) (actual time=0.000..0.000 rows=0.07 loops=1495)
+                          Index Cond: (spec_id = ds.spec_id)
+                          Filter: ((spec_name)::text = 'Dermatologist'::text)
+                          Rows Removed by Filter: 1
+                          Index Searches: 1495
+                          Buffers: shared hit=2990
+        ->  Nested Loop  (cost=0.56..3.58 rows=2 width=4) (actual time=0.007..0.007 rows=0.20 loops=99)
+              Buffers: shared hit=1702
+              ->  Index Only Scan using idx_schedules_inclinic_doctor_weekday_start on doctor_schedules sc  (cost=0.29..0.59 rows=10 width=8) (actual time=0.002..0.002 rows=7.57 loops=99)
+                    Index Cond: (doctor_id = ds.doctor_id)
+                    Heap Fetches: 0
+                    Index Searches: 99
+                    Buffers: shared hit=203
+              ->  Index Only Scan using idx_clinics_city_clinic on clinics c  (cost=0.28..0.30 rows=1 width=4) (actual time=0.000..0.000 rows=0.03 loops=749)
+                    Index Cond: ((city_id = 1) AND (clinic_id = sc.clinic_id))
+                    Heap Fetches: 0
+                    Index Searches: 749
+                    Buffers: shared hit=1499
+Planning:
+  Buffers: shared hit=445
+Planning Time: 1.315 ms
+Execution Time: 2.387 ms
+=== R01 run 4 ===
+Limit  (cost=1.26..192.18 rows=20 width=29) (actual time=0.149..2.206 rows=20.00 loops=1)
+  Buffers: shared hit=7177
+  ->  Nested Loop Semi Join  (cost=1.26..2139.55 rows=224 width=29) (actual time=0.149..2.205 rows=20.00 loops=1)
+        Buffers: shared hit=7177
+        ->  Nested Loop Semi Join  (cost=0.70..1496.60 rows=224 width=33) (actual time=0.022..1.553 rows=99.00 loops=1)
+              Buffers: shared hit=5475
+              ->  Index Only Scan using idx_doctors_verified_experience on doctors d  (cost=0.28..117.01 rows=2715 width=29) (actual time=0.008..0.073 rows=1237.00 loops=1)
+                    Heap Fetches: 0
+                    Index Searches: 1
+                    Buffers: shared hit=10
+              ->  Nested Loop  (cost=0.42..0.50 rows=1 width=4) (actual time=0.001..0.001 rows=0.08 loops=1237)
+                    Buffers: shared hit=5465
+                    ->  Index Only Scan using pk_doctor_specializations on doctor_specializations ds  (cost=0.28..0.32 rows=1 width=8) (actual time=0.000..0.001 rows=1.21 loops=1237)
+                          Index Cond: (doctor_id = d.doctor_id)
+                          Heap Fetches: 0
+                          Index Searches: 1237
+                          Buffers: shared hit=2475
+                    ->  Index Scan using specializations_pkey on specializations s  (cost=0.14..0.16 rows=1 width=4) (actual time=0.000..0.000 rows=0.07 loops=1495)
+                          Index Cond: (spec_id = ds.spec_id)
+                          Filter: ((spec_name)::text = 'Dermatologist'::text)
+                          Rows Removed by Filter: 1
+                          Index Searches: 1495
+                          Buffers: shared hit=2990
+        ->  Nested Loop  (cost=0.56..3.58 rows=2 width=4) (actual time=0.006..0.006 rows=0.20 loops=99)
+              Buffers: shared hit=1702
+              ->  Index Only Scan using idx_schedules_inclinic_doctor_weekday_start on doctor_schedules sc  (cost=0.29..0.59 rows=10 width=8) (actual time=0.002..0.002 rows=7.57 loops=99)
+                    Index Cond: (doctor_id = ds.doctor_id)
+                    Heap Fetches: 0
+                    Index Searches: 99
+                    Buffers: shared hit=203
+              ->  Index Only Scan using idx_clinics_city_clinic on clinics c  (cost=0.28..0.30 rows=1 width=4) (actual time=0.000..0.000 rows=0.03 loops=749)
+                    Index Cond: ((city_id = 1) AND (clinic_id = sc.clinic_id))
+                    Heap Fetches: 0
+                    Index Searches: 749
+                    Buffers: shared hit=1499
+Planning:
+  Buffers: shared hit=445
+Planning Time: 1.373 ms
+Execution Time: 2.242 ms
+=== R01 run 5 ===
+Limit  (cost=1.26..192.18 rows=20 width=29) (actual time=0.128..2.052 rows=20.00 loops=1)
+  Buffers: shared hit=7177
+  ->  Nested Loop Semi Join  (cost=1.26..2139.55 rows=224 width=29) (actual time=0.128..2.050 rows=20.00 loops=1)
+        Buffers: shared hit=7177
+        ->  Nested Loop Semi Join  (cost=0.70..1496.60 rows=224 width=33) (actual time=0.019..1.442 rows=99.00 loops=1)
+              Buffers: shared hit=5475
+              ->  Index Only Scan using idx_doctors_verified_experience on doctors d  (cost=0.28..117.01 rows=2715 width=29) (actual time=0.006..0.067 rows=1237.00 loops=1)
+                    Heap Fetches: 0
+                    Index Searches: 1
+                    Buffers: shared hit=10
+              ->  Nested Loop  (cost=0.42..0.50 rows=1 width=4) (actual time=0.001..0.001 rows=0.08 loops=1237)
+                    Buffers: shared hit=5465
+                    ->  Index Only Scan using pk_doctor_specializations on doctor_specializations ds  (cost=0.28..0.32 rows=1 width=8) (actual time=0.000..0.000 rows=1.21 loops=1237)
+                          Index Cond: (doctor_id = d.doctor_id)
+                          Heap Fetches: 0
+                          Index Searches: 1237
+                          Buffers: shared hit=2475
+                    ->  Index Scan using specializations_pkey on specializations s  (cost=0.14..0.16 rows=1 width=4) (actual time=0.000..0.000 rows=0.07 loops=1495)
+                          Index Cond: (spec_id = ds.spec_id)
+                          Filter: ((spec_name)::text = 'Dermatologist'::text)
+                          Rows Removed by Filter: 1
+                          Index Searches: 1495
+                          Buffers: shared hit=2990
+        ->  Nested Loop  (cost=0.56..3.58 rows=2 width=4) (actual time=0.006..0.006 rows=0.20 loops=99)
+              Buffers: shared hit=1702
+              ->  Index Only Scan using idx_schedules_inclinic_doctor_weekday_start on doctor_schedules sc  (cost=0.29..0.59 rows=10 width=8) (actual time=0.002..0.002 rows=7.57 loops=99)
+                    Index Cond: (doctor_id = ds.doctor_id)
+                    Heap Fetches: 0
+                    Index Searches: 99
+                    Buffers: shared hit=203
+              ->  Index Only Scan using idx_clinics_city_clinic on clinics c  (cost=0.28..0.30 rows=1 width=4) (actual time=0.000..0.000 rows=0.03 loops=749)
+                    Index Cond: ((city_id = 1) AND (clinic_id = sc.clinic_id))
+                    Heap Fetches: 0
+                    Index Searches: 749
+                    Buffers: shared hit=1499
+Planning:
+  Buffers: shared hit=445
+Planning Time: 1.318 ms
+Execution Time: 2.082 ms

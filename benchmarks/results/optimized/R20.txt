@@ -1,0 +1,110 @@
+=== R20 run 1 ===
+WindowAgg  (cost=797.68..893.09 rows=5453 width=44) (actual time=1.151..1.157 rows=26.00 loops=1)
+  Window: w1 AS (ORDER BY ((appointments.slot_start)::date))
+  Storage: Memory  Maximum Storage: 17kB
+  Buffers: shared hit=2038
+  ->  Sort  (cost=797.66..811.30 rows=5453 width=12) (actual time=1.143..1.144 rows=26.00 loops=1)
+        Sort Key: ((appointments.slot_start)::date)
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=2038
+        ->  HashAggregate  (cost=391.07..459.23 rows=5453 width=12) (actual time=1.119..1.135 rows=26.00 loops=1)
+              Group Key: (appointments.slot_start)::date
+              Batches: 1  Memory Usage: 161kB
+              Buffers: shared hit=2035
+              ->  Index Only Scan using idx_appointments_completed_slot on appointments  (cost=0.42..358.36 rows=6541 width=4) (actual time=0.007..0.810 rows=6863.00 loops=1)
+                    Index Cond: ((slot_start >= '2026-06-01 00:00:00+05:30'::timestamp with time zone) AND (slot_start < '2026-07-01 00:00:00+05:30'::timestamp with time zone))
+                    Heap Fetches: 2195
+                    Index Searches: 1
+                    Buffers: shared hit=2035
+Planning:
+  Buffers: shared hit=420
+Planning Time: 0.577 ms
+Execution Time: 1.202 ms
+=== R20 run 2 ===
+WindowAgg  (cost=797.68..893.09 rows=5453 width=44) (actual time=1.130..1.136 rows=26.00 loops=1)
+  Window: w1 AS (ORDER BY ((appointments.slot_start)::date))
+  Storage: Memory  Maximum Storage: 17kB
+  Buffers: shared hit=2038
+  ->  Sort  (cost=797.66..811.30 rows=5453 width=12) (actual time=1.121..1.121 rows=26.00 loops=1)
+        Sort Key: ((appointments.slot_start)::date)
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=2038
+        ->  HashAggregate  (cost=391.07..459.23 rows=5453 width=12) (actual time=1.097..1.113 rows=26.00 loops=1)
+              Group Key: (appointments.slot_start)::date
+              Batches: 1  Memory Usage: 161kB
+              Buffers: shared hit=2035
+              ->  Index Only Scan using idx_appointments_completed_slot on appointments  (cost=0.42..358.36 rows=6541 width=4) (actual time=0.007..0.791 rows=6863.00 loops=1)
+                    Index Cond: ((slot_start >= '2026-06-01 00:00:00+05:30'::timestamp with time zone) AND (slot_start < '2026-07-01 00:00:00+05:30'::timestamp with time zone))
+                    Heap Fetches: 2195
+                    Index Searches: 1
+                    Buffers: shared hit=2035
+Planning:
+  Buffers: shared hit=420
+Planning Time: 0.575 ms
+Execution Time: 1.176 ms
+=== R20 run 3 ===
+WindowAgg  (cost=797.68..893.09 rows=5453 width=44) (actual time=1.151..1.157 rows=26.00 loops=1)
+  Window: w1 AS (ORDER BY ((appointments.slot_start)::date))
+  Storage: Memory  Maximum Storage: 17kB
+  Buffers: shared hit=2038
+  ->  Sort  (cost=797.66..811.30 rows=5453 width=12) (actual time=1.143..1.144 rows=26.00 loops=1)
+        Sort Key: ((appointments.slot_start)::date)
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=2038
+        ->  HashAggregate  (cost=391.07..459.23 rows=5453 width=12) (actual time=1.119..1.136 rows=26.00 loops=1)
+              Group Key: (appointments.slot_start)::date
+              Batches: 1  Memory Usage: 161kB
+              Buffers: shared hit=2035
+              ->  Index Only Scan using idx_appointments_completed_slot on appointments  (cost=0.42..358.36 rows=6541 width=4) (actual time=0.007..0.812 rows=6863.00 loops=1)
+                    Index Cond: ((slot_start >= '2026-06-01 00:00:00+05:30'::timestamp with time zone) AND (slot_start < '2026-07-01 00:00:00+05:30'::timestamp with time zone))
+                    Heap Fetches: 2195
+                    Index Searches: 1
+                    Buffers: shared hit=2035
+Planning:
+  Buffers: shared hit=420
+Planning Time: 0.592 ms
+Execution Time: 1.198 ms
+=== R20 run 4 ===
+WindowAgg  (cost=797.68..893.09 rows=5453 width=44) (actual time=1.083..1.088 rows=26.00 loops=1)
+  Window: w1 AS (ORDER BY ((appointments.slot_start)::date))
+  Storage: Memory  Maximum Storage: 17kB
+  Buffers: shared hit=2038
+  ->  Sort  (cost=797.66..811.30 rows=5453 width=12) (actual time=1.075..1.076 rows=26.00 loops=1)
+        Sort Key: ((appointments.slot_start)::date)
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=2038
+        ->  HashAggregate  (cost=391.07..459.23 rows=5453 width=12) (actual time=1.053..1.068 rows=26.00 loops=1)
+              Group Key: (appointments.slot_start)::date
+              Batches: 1  Memory Usage: 161kB
+              Buffers: shared hit=2035
+              ->  Index Only Scan using idx_appointments_completed_slot on appointments  (cost=0.42..358.36 rows=6541 width=4) (actual time=0.007..0.764 rows=6863.00 loops=1)
+                    Index Cond: ((slot_start >= '2026-06-01 00:00:00+05:30'::timestamp with time zone) AND (slot_start < '2026-07-01 00:00:00+05:30'::timestamp with time zone))
+                    Heap Fetches: 2195
+                    Index Searches: 1
+                    Buffers: shared hit=2035
+Planning:
+  Buffers: shared hit=420
+Planning Time: 0.581 ms
+Execution Time: 1.126 ms
+=== R20 run 5 ===
+WindowAgg  (cost=797.68..893.09 rows=5453 width=44) (actual time=1.114..1.119 rows=26.00 loops=1)
+  Window: w1 AS (ORDER BY ((appointments.slot_start)::date))
+  Storage: Memory  Maximum Storage: 17kB
+  Buffers: shared hit=2038
+  ->  Sort  (cost=797.66..811.30 rows=5453 width=12) (actual time=1.106..1.107 rows=26.00 loops=1)
+        Sort Key: ((appointments.slot_start)::date)
+        Sort Method: quicksort  Memory: 25kB
+        Buffers: shared hit=2038
+        ->  HashAggregate  (cost=391.07..459.23 rows=5453 width=12) (actual time=1.083..1.099 rows=26.00 loops=1)
+              Group Key: (appointments.slot_start)::date
+              Batches: 1  Memory Usage: 161kB
+              Buffers: shared hit=2035
+              ->  Index Only Scan using idx_appointments_completed_slot on appointments  (cost=0.42..358.36 rows=6541 width=4) (actual time=0.007..0.759 rows=6863.00 loops=1)
+                    Index Cond: ((slot_start >= '2026-06-01 00:00:00+05:30'::timestamp with time zone) AND (slot_start < '2026-07-01 00:00:00+05:30'::timestamp with time zone))
+                    Heap Fetches: 2195
+                    Index Searches: 1
+                    Buffers: shared hit=2035
+Planning:
+  Buffers: shared hit=420
+Planning Time: 0.539 ms
+Execution Time: 1.156 ms

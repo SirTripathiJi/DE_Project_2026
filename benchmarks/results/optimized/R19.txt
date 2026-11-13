@@ -1,0 +1,220 @@
+=== R19 run 1 ===
+Sort  (cost=7564.70..7572.20 rows=3000 width=36) (actual time=21.301..21.311 rows=480.00 loops=1)
+  Sort Key: (COALESCE(ds.june_consults, '0'::bigint)) DESC
+  Sort Method: quicksort  Memory: 51kB
+  Buffers: shared hit=3004
+  ->  Hash Left Join  (cost=6706.23..7391.44 rows=3000 width=36) (actual time=19.434..21.266 rows=480.00 loops=1)
+        Hash Cond: (d.doctor_id = ds.doctor_id)
+        Buffers: shared hit=3001
+        ->  Hash Right Semi Join  (cost=133.98..811.31 rows=3000 width=20) (actual time=0.329..2.125 rows=480.00 loops=1)
+              Hash Cond: (sc.doctor_id = d.doctor_id)
+              Buffers: shared hit=279
+              ->  Hash Join  (cost=15.48..625.71 rows=4880 width=4) (actual time=0.035..1.631 rows=3900.00 loops=1)
+                    Hash Cond: (sc.clinic_id = c.clinic_id)
+                    Buffers: shared hit=228
+                    ->  Seq Scan on doctor_schedules sc  (cost=0.00..529.99 rows=30499 width=8) (actual time=0.006..0.694 rows=30499.00 loops=1)
+                          Buffers: shared hit=225
+                    ->  Hash  (cost=12.48..12.48 rows=240 width=4) (actual time=0.022..0.022 rows=240.00 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 17kB
+                          Buffers: shared hit=3
+                          ->  Index Only Scan using idx_clinics_city_clinic on clinics c  (cost=0.28..12.48 rows=240 width=4) (actual time=0.006..0.013 rows=240.00 loops=1)
+                                Index Cond: (city_id = 1)
+                                Heap Fetches: 0
+                                Index Searches: 1
+                                Buffers: shared hit=3
+              ->  Hash  (cost=81.00..81.00 rows=3000 width=20) (actual time=0.290..0.290 rows=3000.00 loops=1)
+                    Buckets: 4096  Batches: 1  Memory Usage: 186kB
+                    Buffers: shared hit=51
+                    ->  Seq Scan on doctors d  (cost=0.00..81.00 rows=3000 width=20) (actual time=0.003..0.145 rows=3000.00 loops=1)
+                          Buffers: shared hit=51
+        ->  Hash  (cost=6534.75..6534.75 rows=3000 width=20) (actual time=19.099..19.100 rows=3000.00 loops=1)
+              Buckets: 4096  Batches: 1  Memory Usage: 185kB
+              Buffers: shared hit=2722
+              ->  Subquery Scan on ds  (cost=6474.75..6534.75 rows=3000 width=20) (actual time=18.763..18.981 rows=3000.00 loops=1)
+                    Buffers: shared hit=2722
+                    ->  HashAggregate  (cost=6474.75..6504.75 rows=3000 width=20) (actual time=18.763..18.880 rows=3000.00 loops=1)
+                          Group Key: a.doctor_id
+                          Batches: 1  Memory Usage: 345kB
+                          Buffers: shared hit=2722
+                          ->  Seq Scan on appointments a  (cost=0.00..4223.10 rows=150110 width=29) (actual time=0.003..4.346 rows=150000.00 loops=1)
+                                Buffers: shared hit=2722
+Planning:
+  Buffers: shared hit=637
+Planning Time: 1.073 ms
+Execution Time: 21.364 ms
+=== R19 run 2 ===
+Sort  (cost=7564.70..7572.20 rows=3000 width=36) (actual time=20.932..20.942 rows=480.00 loops=1)
+  Sort Key: (COALESCE(ds.june_consults, '0'::bigint)) DESC
+  Sort Method: quicksort  Memory: 51kB
+  Buffers: shared hit=3004
+  ->  Hash Left Join  (cost=6706.23..7391.44 rows=3000 width=36) (actual time=19.071..20.898 rows=480.00 loops=1)
+        Hash Cond: (d.doctor_id = ds.doctor_id)
+        Buffers: shared hit=3001
+        ->  Hash Right Semi Join  (cost=133.98..811.31 rows=3000 width=20) (actual time=0.305..2.096 rows=480.00 loops=1)
+              Hash Cond: (sc.doctor_id = d.doctor_id)
+              Buffers: shared hit=279
+              ->  Hash Join  (cost=15.48..625.71 rows=4880 width=4) (actual time=0.032..1.629 rows=3900.00 loops=1)
+                    Hash Cond: (sc.clinic_id = c.clinic_id)
+                    Buffers: shared hit=228
+                    ->  Seq Scan on doctor_schedules sc  (cost=0.00..529.99 rows=30499 width=8) (actual time=0.005..0.683 rows=30499.00 loops=1)
+                          Buffers: shared hit=225
+                    ->  Hash  (cost=12.48..12.48 rows=240 width=4) (actual time=0.021..0.021 rows=240.00 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 17kB
+                          Buffers: shared hit=3
+                          ->  Index Only Scan using idx_clinics_city_clinic on clinics c  (cost=0.28..12.48 rows=240 width=4) (actual time=0.006..0.012 rows=240.00 loops=1)
+                                Index Cond: (city_id = 1)
+                                Heap Fetches: 0
+                                Index Searches: 1
+                                Buffers: shared hit=3
+              ->  Hash  (cost=81.00..81.00 rows=3000 width=20) (actual time=0.270..0.270 rows=3000.00 loops=1)
+                    Buckets: 4096  Batches: 1  Memory Usage: 186kB
+                    Buffers: shared hit=51
+                    ->  Seq Scan on doctors d  (cost=0.00..81.00 rows=3000 width=20) (actual time=0.002..0.130 rows=3000.00 loops=1)
+                          Buffers: shared hit=51
+        ->  Hash  (cost=6534.75..6534.75 rows=3000 width=20) (actual time=18.760..18.761 rows=3000.00 loops=1)
+              Buckets: 4096  Batches: 1  Memory Usage: 185kB
+              Buffers: shared hit=2722
+              ->  Subquery Scan on ds  (cost=6474.75..6534.75 rows=3000 width=20) (actual time=18.411..18.630 rows=3000.00 loops=1)
+                    Buffers: shared hit=2722
+                    ->  HashAggregate  (cost=6474.75..6504.75 rows=3000 width=20) (actual time=18.411..18.529 rows=3000.00 loops=1)
+                          Group Key: a.doctor_id
+                          Batches: 1  Memory Usage: 345kB
+                          Buffers: shared hit=2722
+                          ->  Seq Scan on appointments a  (cost=0.00..4223.10 rows=150110 width=29) (actual time=0.002..4.216 rows=150000.00 loops=1)
+                                Buffers: shared hit=2722
+Planning:
+  Buffers: shared hit=637
+Planning Time: 0.930 ms
+Execution Time: 20.986 ms
+=== R19 run 3 ===
+Sort  (cost=7564.70..7572.20 rows=3000 width=36) (actual time=21.163..21.173 rows=480.00 loops=1)
+  Sort Key: (COALESCE(ds.june_consults, '0'::bigint)) DESC
+  Sort Method: quicksort  Memory: 51kB
+  Buffers: shared hit=3004
+  ->  Hash Left Join  (cost=6706.23..7391.44 rows=3000 width=36) (actual time=19.288..21.129 rows=480.00 loops=1)
+        Hash Cond: (d.doctor_id = ds.doctor_id)
+        Buffers: shared hit=3001
+        ->  Hash Right Semi Join  (cost=133.98..811.31 rows=3000 width=20) (actual time=0.327..2.131 rows=480.00 loops=1)
+              Hash Cond: (sc.doctor_id = d.doctor_id)
+              Buffers: shared hit=279
+              ->  Hash Join  (cost=15.48..625.71 rows=4880 width=4) (actual time=0.033..1.644 rows=3900.00 loops=1)
+                    Hash Cond: (sc.clinic_id = c.clinic_id)
+                    Buffers: shared hit=228
+                    ->  Seq Scan on doctor_schedules sc  (cost=0.00..529.99 rows=30499 width=8) (actual time=0.006..0.681 rows=30499.00 loops=1)
+                          Buffers: shared hit=225
+                    ->  Hash  (cost=12.48..12.48 rows=240 width=4) (actual time=0.021..0.021 rows=240.00 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 17kB
+                          Buffers: shared hit=3
+                          ->  Index Only Scan using idx_clinics_city_clinic on clinics c  (cost=0.28..12.48 rows=240 width=4) (actual time=0.007..0.013 rows=240.00 loops=1)
+                                Index Cond: (city_id = 1)
+                                Heap Fetches: 0
+                                Index Searches: 1
+                                Buffers: shared hit=3
+              ->  Hash  (cost=81.00..81.00 rows=3000 width=20) (actual time=0.289..0.289 rows=3000.00 loops=1)
+                    Buckets: 4096  Batches: 1  Memory Usage: 186kB
+                    Buffers: shared hit=51
+                    ->  Seq Scan on doctors d  (cost=0.00..81.00 rows=3000 width=20) (actual time=0.003..0.158 rows=3000.00 loops=1)
+                          Buffers: shared hit=51
+        ->  Hash  (cost=6534.75..6534.75 rows=3000 width=20) (actual time=18.956..18.956 rows=3000.00 loops=1)
+              Buckets: 4096  Batches: 1  Memory Usage: 185kB
+              Buffers: shared hit=2722
+              ->  Subquery Scan on ds  (cost=6474.75..6534.75 rows=3000 width=20) (actual time=18.612..18.834 rows=3000.00 loops=1)
+                    Buffers: shared hit=2722
+                    ->  HashAggregate  (cost=6474.75..6504.75 rows=3000 width=20) (actual time=18.611..18.731 rows=3000.00 loops=1)
+                          Group Key: a.doctor_id
+                          Batches: 1  Memory Usage: 345kB
+                          Buffers: shared hit=2722
+                          ->  Seq Scan on appointments a  (cost=0.00..4223.10 rows=150110 width=29) (actual time=0.002..4.210 rows=150000.00 loops=1)
+                                Buffers: shared hit=2722
+Planning:
+  Buffers: shared hit=637
+Planning Time: 0.943 ms
+Execution Time: 21.231 ms
+=== R19 run 4 ===
+Sort  (cost=7564.70..7572.20 rows=3000 width=36) (actual time=20.935..20.944 rows=480.00 loops=1)
+  Sort Key: (COALESCE(ds.june_consults, '0'::bigint)) DESC
+  Sort Method: quicksort  Memory: 51kB
+  Buffers: shared hit=3004
+  ->  Hash Left Join  (cost=6706.23..7391.44 rows=3000 width=36) (actual time=19.077..20.902 rows=480.00 loops=1)
+        Hash Cond: (d.doctor_id = ds.doctor_id)
+        Buffers: shared hit=3001
+        ->  Hash Right Semi Join  (cost=133.98..811.31 rows=3000 width=20) (actual time=0.300..2.087 rows=480.00 loops=1)
+              Hash Cond: (sc.doctor_id = d.doctor_id)
+              Buffers: shared hit=279
+              ->  Hash Join  (cost=15.48..625.71 rows=4880 width=4) (actual time=0.032..1.624 rows=3900.00 loops=1)
+                    Hash Cond: (sc.clinic_id = c.clinic_id)
+                    Buffers: shared hit=228
+                    ->  Seq Scan on doctor_schedules sc  (cost=0.00..529.99 rows=30499 width=8) (actual time=0.005..0.678 rows=30499.00 loops=1)
+                          Buffers: shared hit=225
+                    ->  Hash  (cost=12.48..12.48 rows=240 width=4) (actual time=0.020..0.020 rows=240.00 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 17kB
+                          Buffers: shared hit=3
+                          ->  Index Only Scan using idx_clinics_city_clinic on clinics c  (cost=0.28..12.48 rows=240 width=4) (actual time=0.006..0.012 rows=240.00 loops=1)
+                                Index Cond: (city_id = 1)
+                                Heap Fetches: 0
+                                Index Searches: 1
+                                Buffers: shared hit=3
+              ->  Hash  (cost=81.00..81.00 rows=3000 width=20) (actual time=0.264..0.264 rows=3000.00 loops=1)
+                    Buckets: 4096  Batches: 1  Memory Usage: 186kB
+                    Buffers: shared hit=51
+                    ->  Seq Scan on doctors d  (cost=0.00..81.00 rows=3000 width=20) (actual time=0.002..0.133 rows=3000.00 loops=1)
+                          Buffers: shared hit=51
+        ->  Hash  (cost=6534.75..6534.75 rows=3000 width=20) (actual time=18.772..18.773 rows=3000.00 loops=1)
+              Buckets: 4096  Batches: 1  Memory Usage: 185kB
+              Buffers: shared hit=2722
+              ->  Subquery Scan on ds  (cost=6474.75..6534.75 rows=3000 width=20) (actual time=18.436..18.647 rows=3000.00 loops=1)
+                    Buffers: shared hit=2722
+                    ->  HashAggregate  (cost=6474.75..6504.75 rows=3000 width=20) (actual time=18.436..18.548 rows=3000.00 loops=1)
+                          Group Key: a.doctor_id
+                          Batches: 1  Memory Usage: 345kB
+                          Buffers: shared hit=2722
+                          ->  Seq Scan on appointments a  (cost=0.00..4223.10 rows=150110 width=29) (actual time=0.002..4.225 rows=150000.00 loops=1)
+                                Buffers: shared hit=2722
+Planning:
+  Buffers: shared hit=637
+Planning Time: 0.924 ms
+Execution Time: 20.991 ms
+=== R19 run 5 ===
+Sort  (cost=7564.70..7572.20 rows=3000 width=36) (actual time=20.988..20.997 rows=480.00 loops=1)
+  Sort Key: (COALESCE(ds.june_consults, '0'::bigint)) DESC
+  Sort Method: quicksort  Memory: 51kB
+  Buffers: shared hit=3004
+  ->  Hash Left Join  (cost=6706.23..7391.44 rows=3000 width=36) (actual time=19.090..20.954 rows=480.00 loops=1)
+        Hash Cond: (d.doctor_id = ds.doctor_id)
+        Buffers: shared hit=3001
+        ->  Hash Right Semi Join  (cost=133.98..811.31 rows=3000 width=20) (actual time=0.326..2.153 rows=480.00 loops=1)
+              Hash Cond: (sc.doctor_id = d.doctor_id)
+              Buffers: shared hit=279
+              ->  Hash Join  (cost=15.48..625.71 rows=4880 width=4) (actual time=0.032..1.659 rows=3900.00 loops=1)
+                    Hash Cond: (sc.clinic_id = c.clinic_id)
+                    Buffers: shared hit=228
+                    ->  Seq Scan on doctor_schedules sc  (cost=0.00..529.99 rows=30499 width=8) (actual time=0.005..0.706 rows=30499.00 loops=1)
+                          Buffers: shared hit=225
+                    ->  Hash  (cost=12.48..12.48 rows=240 width=4) (actual time=0.021..0.021 rows=240.00 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 17kB
+                          Buffers: shared hit=3
+                          ->  Index Only Scan using idx_clinics_city_clinic on clinics c  (cost=0.28..12.48 rows=240 width=4) (actual time=0.006..0.012 rows=240.00 loops=1)
+                                Index Cond: (city_id = 1)
+                                Heap Fetches: 0
+                                Index Searches: 1
+                                Buffers: shared hit=3
+              ->  Hash  (cost=81.00..81.00 rows=3000 width=20) (actual time=0.265..0.265 rows=3000.00 loops=1)
+                    Buckets: 4096  Batches: 1  Memory Usage: 186kB
+                    Buffers: shared hit=51
+                    ->  Seq Scan on doctors d  (cost=0.00..81.00 rows=3000 width=20) (actual time=0.003..0.134 rows=3000.00 loops=1)
+                          Buffers: shared hit=51
+        ->  Hash  (cost=6534.75..6534.75 rows=3000 width=20) (actual time=18.758..18.758 rows=3000.00 loops=1)
+              Buckets: 4096  Batches: 1  Memory Usage: 185kB
+              Buffers: shared hit=2722
+              ->  Subquery Scan on ds  (cost=6474.75..6534.75 rows=3000 width=20) (actual time=18.404..18.630 rows=3000.00 loops=1)
+                    Buffers: shared hit=2722
+                    ->  HashAggregate  (cost=6474.75..6504.75 rows=3000 width=20) (actual time=18.404..18.526 rows=3000.00 loops=1)
+                          Group Key: a.doctor_id
+                          Batches: 1  Memory Usage: 345kB
+                          Buffers: shared hit=2722
+                          ->  Seq Scan on appointments a  (cost=0.00..4223.10 rows=150110 width=29) (actual time=0.002..4.281 rows=150000.00 loops=1)
+                                Buffers: shared hit=2722
+Planning:
+  Buffers: shared hit=637
+Planning Time: 0.951 ms
+Execution Time: 21.042 ms
