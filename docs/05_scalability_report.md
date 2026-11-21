@@ -7,7 +7,7 @@
 | PostgreSQL | 18.7 |
 | Measured | 21 November 2026 |
 
-**Status:** Large-data load and benchmark complete; all official mean-time targets pass. A genuine scale-specific regression was reduced and remeasured. Partitioning was tested on populated data. Sharding, replica lag, and cache performance remain design analyses, not experiments.
+**Status:** Large-data load and benchmark complete; all official mean-time targets pass. A scale-specific R24 regression was reduced and alternative plans were tested. Partitioning was tested on populated data. A temporary same-host asynchronous standby was used to measure replay lag; sharding and cache performance remain design analyses.
 
 ## 1. Scope and reproducibility
 
@@ -142,6 +142,20 @@ Result preservation was checked with `EXCEPT ALL` in both directions. The origin
 
 No other query exceeded its official mean target; no further index or SQL change was justified by this run. Sequential scans in R14/R15/R19 and a sequential scan of a small reference table in other plans are not by themselves defects: the broad relation/aggregate work can make a sequential scan cheaper. R10 (684.276 ms), R14 (505.020 ms), R17 (691.990 ms), R19 (549.582 ms), and W04 (945.381 ms) deserve monitoring as data grows; current evidence does not show they miss their specified mean targets.
 
+### R24 follow-up plan and index experiments
+
+The current plan's main work is the ordered scan and grouping of 2,703,682 active appointment entries. It removes 2,681,261 single-row groups and retains 11,178 duplicate slots; the current raw plan records 317,336 heap fetches in the index-only scan. The pair probes and final in-memory sort are smaller. PostgreSQL still visits heap pages for tuples whose visibility cannot be established from the visibility map, even for an index-only scan ([PostgreSQL index-only scans](https://www.postgresql.org/docs/18/indexes-index-only-scans.html)).
+
+Two alternatives were tested read-only or transactionally on the same large database:
+
+| Candidate | Measured result | Equivalence / storage | Decision |
+|---|---|---|---|
+| Aggregate IDs into arrays and enumerate pairs, using existing indexes | 957.188 ms in one `EXPLAIN ANALYZE`; plan added an incremental sort and still fetched 348,400 heap tuples | 11,308 output rows; `EXCEPT ALL` differences were zero both ways | Slower than the existing three-run mean; reject. |
+| Same array rewrite with a temporary covering partial index `(doctor_id, slot_start, appointment_id) WHERE status <> 'CANCELLED'` | 507.462 ms in one run; 317,333 heap fetches remained | Temporary index was 105 MB and was rolled back; array rewrite's row multiset was already verified above | One run is not a matched improvement claim; added storage did not remove the visibility-fetch bottleneck. |
+| Unchanged current R24 SQL with that temporary covering partial index | Three-run mean 452.481 ms (480.114, 439.559, 437.771); the candidate index served both pair probes and reduced their heap fetches from 7,717 to 3,857 | 11,308 rows each run; 105 MB index; transaction rolled back. Raw plans and timings are preserved. | Later two runs average 438.665 ms versus 457.648 ms for the earlier current-query runs 2–3 (about 4.1% lower), but cache and run ordering were not controlled. The test does not establish a reliable improvement worth the added index and write cost. |
+
+The full candidate plans and equivalence output are `R24_alternative_test.log`, `R24_covering_index_test.log`, and `R24_partial_index_current_query_test.log`; their SQL is in the matching `*_test.sql` files. The three-run current-query candidate results are in `R24_partial_index_current_query_test.csv`. These tests did not change `sql/05_indexes.sql`, `sql/06_optimized_queries.sql`, or the persistent database. Each experimental index existed only inside a transaction that was rolled back. The evidence supports keeping the current rewrite and index set: R24 is below the 5,000 ms report target, the array SQL alternative was slower, and the covering index adds 105 MB while its apparent warm-run gain is small and confounded by cache state. Avoiding the full active-slot scan would require maintaining a duplicate-slot summary as appointments are inserted, moved, or cancelled; that adds write-path and correctness complexity for one report query and was not justified here.
+
 ## 6. Storage
 
 The large database was measured after loading and applying the CP3 indexes, before adding the partition candidate. The ordinary-table and index scopes cover all 11 base tables. `partition_storage.csv` separately compares only the ordinary appointments relation with the leaves of the populated candidate; database size at this later point includes both sets and all other objects.
@@ -172,7 +186,7 @@ The SQL and experiment are review evidence, not a production cutover. Monthly pa
 
 ## 8. Sharding, replicas, caching, and maintenance
 
-These are architecture recommendations informed by this workload's measured large-data behavior; no distributed cluster, replica, or cache was created, so no cross-node speedup or lag is claimed.
+These are architecture recommendations informed by this workload's measured large-data behavior. At this scale the database has 3,000,000 appointments, 60,000 doctors, 800,000 patients, and 10 cities. The measured report means include R10 at 684.276 ms, R14 at 505.020 ms, R19 at 549.582 ms, and R24 at 562.748 ms; these identify candidate workload classes, not guaranteed gains from distribution.
 
 ### Sharding options
 
@@ -180,15 +194,27 @@ These are architecture recommendations informed by this workload's measured larg
 - **Doctor shard:** makes doctor availability/queue and many appointment writes local (R02/R03/R05, W01/W02/W04/W05). Patient history, prescription views, and patient safety queries then fan out across doctors; city discovery and reporting also need aggregation across shards.
 - **Patient shard:** makes patient history and patient-linked prescription/safety reads local (R04/R07/R10/R11). Doctor scheduling, queues, bookings, and doctor-wide reporting must fan out across patient shards.
 
-No single key localizes both patient-centered and doctor-centered flows. The right choice depends on the dominant transaction and the operational cost of fan-out; measure cross-shard request rates and coordination latency before selecting a key. Small reference tables may be replicated if update and consistency rules are explicit.
+| Candidate key | Local workload examples | Cross-shard cost / risk | Assessment |
+|---|---|---|---|
+| City | R01 clinic/doctor discovery and city-local reports | Only 10 city values; doctor schedules and video appointments may not have a clinic city, while patients can use providers outside their home city. City-wide aggregates still fan out. | Consider only if measured traffic is strongly city-local and per-city volume is balanced. City assignment for video appointments must be defined first. |
+| Doctor | Doctor schedules, appointment-slot conflicts, queues, and W01/W02/W04/W05 appointment writes; R05 is 0.102 ms on the current 3M-row database | Patient history, allergy/prescription analysis (R04/R07/R10/R11), and multi-doctor care queries need patient routing or fan-out. | Best initial candidate if booking and doctor operations dominate. Co-locate schedules and appointments by `doctor_id`; retain patient identity as a lookup/reference and measure fan-out before rollout. |
+| Patient | Patient appointment history, prescriptions, and safety lookups (R04/R07/R10/R11); R10 is currently 684.276 ms | Doctor availability, daily queues (R03/R05), double-booking checks (R24), and doctor-wide analytics span patient shards. | Choose only if patient-facing history/safety reads dominate and cross-doctor coordination can be handled. |
 
-### Read replicas and caching
+No single key localizes both patient-centered and doctor-centered flows. For a booking-heavy workload, doctor-based placement is the most direct starting hypothesis, not a proven speedup. The project has 10 city keys, 60,000 doctor keys and 800,000 patient keys, but no measured per-key skew or cross-shard request rate; profile those before choosing shard count or estimating gains. Small reference tables may be replicated if update and consistency rules are explicit.
 
-The large measurements identify expensive read candidates: R10 684.276 ms, R14 505.020 ms, R15 366.255 ms, R17 691.990 ms, R19 549.582 ms, R24 562.748 ms, and R25 356.415 ms. Reporting queries can be routed to an asynchronous replica or served from refreshed summaries only if the acceptable staleness window is defined. This is an architectural recommendation, not an observed replica or cache result. Booking/availability, patient and doctor screens that drive an immediate action, payment state, and all W01–W05 writes need primary-consistent handling. Cache invalidation must never permit conflicting bookings or expose stale authorization-sensitive patient data.
+### Read replica behavior measured on the isolated cluster
+
+The CP4 cluster already had `wal_level=replica`, capacity for ten WAL senders and slots, and no active replica. A temporary physical standby was created with `pg_basebackup` in a separate scratch directory; no packages or persistent server configuration were changed. The standby streamed asynchronously over the local socket. To probe visibility lag, a separate disposable database received 50,000 rows with 512-byte payloads (25,600,000 payload bytes; database size 37 MB). Immediately after commit, `pg_stat_replication` reported 67.551 ms replay lag; the primary's target LSN was 6,089,968 bytes ahead of the replay LSN in that sample. A subsequent standby query observed all 50,000 rows and replayed beyond the target LSN. The raw primary/standby outputs and exact LSNs are in `replica_lag_primary.log`, `replica_lag_standby.log`, and `replica_lag_measurement.csv`; the repeatable probe SQL is `replica_lag_probe.sql`.
+
+This is one same-host observation, not a lag guarantee or networked throughput experiment. The reported `replay_lag` is the measured time for recent WAL to be written, flushed, and replayed; PostgreSQL documents that it is not a prediction of catch-up time and becomes NULL after an idle standby has fully caught up ([`pg_stat_replication`](https://www.postgresql.org/docs/18/monitoring-stats.html#MONITORING-PG-STAT-REPLICATION-VIEW)). The scratch standby, probe database, and physical replication slot were stopped and removed after the test. Replicas are a plausible way to offload report traffic for R14/R15/R17/R19/R24/R25; they do not make an isolated query plan faster, and applications must check freshness before acting on results. R10 contains patient safety data, so replica routing also needs access controls and a freshness requirement.
+
+### Caching design
+
+The large measurements identify expensive read candidates: R10 684.276 ms, R14 505.020 ms, R15 366.255 ms, R17 691.990 ms, R19 549.582 ms, R24 562.748 ms, and R25 356.415 ms. For stable analytics, a database materialized view or report cache could expose an `as_of` watermark and an agreed refresh interval. R03 availability (0.332 ms) and booking/check-in/payment state must remain primary-consistent; caching them risks offering a slot that has already been booked. R10 is both sensitive and update-sensitive, so caching identifiable results is not recommended. R23's 0.124 ms lookup is too cheap to justify a cache on these measurements. No application cache was created: this repository has no application/cache layer, and the faculty disallows external caching as a Phase 4 query optimization. This design has no measured hit rate or speedup. Repeated PostgreSQL buffer-cache reads are not treated as an application-cache experiment.
 
 ### Maintenance
 
-After bulk load, run `ANALYZE`; for ongoing service, monitor statistics and plan changes, dead tuples, autovacuum progress, and index growth. Appointments and prescriptions receive updates, so autovacuum health and write amplification matter. Consider monthly archive/partition retention only after checking prescription/review relationships, reporting retention, backups, and restore procedures. Materialized summaries can help stable analytics if refresh cost and staleness are measured. The current storage figures provide a baseline for that follow-up; no vacuum, archive, replica-lag, or refresh experiment was part of this run.
+After bulk load, run `ANALYZE`; for ongoing service, monitor statistics and plan changes, dead tuples, autovacuum progress, and index growth. Appointments and prescriptions receive updates, so autovacuum health and write amplification matter. The R24 index-only scan's 317,336 heap fetches are a reason to monitor visibility-map coverage and vacuum progress, not evidence that a one-time manual vacuum will permanently eliminate heap access. Consider monthly archive/partition retention only after checking prescription/review relationships, reporting retention, backups, and restore procedures. Materialized summaries can help stable analytics if refresh cost and staleness are measured. No vacuum, archive, or summary-refresh experiment was part of this run; the separate replica-lag probe is described above.
 
 ## 9. Evidence index and remaining limitations
 
@@ -196,6 +222,10 @@ Key artifacts under `benchmarks/results/large/`:
 
 - `summary.csv`, `R01.txt`–`R25.txt`, `W01.txt`–`W05.txt`: final 30-query measurements and raw plans.
 - `summary_before_R24_fix.csv`, `R24_before_fix.txt`, `R24.txt`, and `large_r24_after/`: R24 large-data before/after evidence.
+- `R24_alternative_test.sql` / `.log` and `R24_covering_index_test.sql` / `.log`: read-only query and transactional covering-index alternatives; the tested index was rolled back.
+- `R24_partial_index_current_query_test.sql` / `.log` / `.csv`: three current-query runs with a transient covering index, rolled back after measurement.
+- `index_write_overhead.log` / `.csv`: controlled session-temporary comparison of identical 3M-row tables with only the primary key versus the ten workload secondary indexes.
+- `replica_lag_probe.sql`, `replica_lag_primary.log`, `replica_lag_standby.log`, and `replica_lag_measurement.csv`: temporary asynchronous physical-replica lag probe; the scratch standby, slot, and disposable database were removed after the test.
 - `benchmarks/results/optimized_r24_scale_fix_seed/`: five-run seed measurement of the current R24 rewrite, used for the matched growth ratio.
 - `R24_candidate_test.sql` / `.log`: result-equivalence comparison.
 - `row_counts.csv`, `load_validation.log`, `load_data.log`, `schema_apply.log`, `index_application.log`, `index_validation.log`: load, integrity, and index checks.
@@ -205,4 +235,4 @@ Key artifacts under `benchmarks/results/large/`:
 - `partition_population.log`, `partition_query_comparison.sql` / `.log`, `partition_month_comparison.sql` / `.log`, `partition_pruning.txt`, `partition_ddl_setup.log`: populated partition evidence.
 - `dataset_metadata.json`, `seed_reference_validation.txt`: dataset and seed-source validation.
 
-The large-data run, all 30 target averages, row counts, four integrity checks, and populated pruning are verified. The three no-match write cases are a workload-data limitation, W04 has substantial run-to-run variation, R24 still grows substantially relative to seed, partitioned foreign-key/global-ID migration remains unresolved by design, and sharding/replica/cache benefits have not been experimentally measured. These limits are stated rather than inferred away.
+The large-data run, all 30 target averages, row counts, four integrity checks, and populated pruning are verified. The three no-match write cases are a workload-data limitation, W04 has substantial run-to-run variation, R24 still grows substantially relative to seed but remains below its target, partitioned foreign-key/global-ID migration remains unresolved by design, and sharding/cache benefits have not been experimentally measured. The replica lag result is one same-host sample. The controlled secondary-index test excludes WAL and production concurrency. These limits are stated rather than inferred away.

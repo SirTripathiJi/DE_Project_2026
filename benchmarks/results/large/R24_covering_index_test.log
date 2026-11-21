@@ -1,0 +1,54 @@
+BEGIN
+SET
+SET
+SET
+SET
+SET
+CREATE INDEX
+ experimental_index_size
+-------------------------
+ 105 MB
+(1 row)
+
+                                                                                     QUERY PLAN
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=9445381637.38..9528714970.71 rows=33333333333 width=20) (actual time=507.004..507.243 rows=11308.00 loops=1)
+   Sort Key: d.slot_start DESC
+   Sort Method: quicksort  Memory: 826kB
+   Buffers: shared hit=442072 read=13321
+   I/O Timings: shared read=22.818
+   CTE duplicate_slots
+     ->  GroupAggregate  (cost=0.43..151046.93 rows=100000 width=44) (actual time=0.035..491.145 rows=11178.00 loops=1)
+           Group Key: appointments.doctor_id, appointments.slot_start
+           Filter: (count(*) > 1)
+           Rows Removed by Filter: 2681261
+           Buffers: shared hit=442072 read=13321
+           I/O Timings: shared read=22.818
+           ->  Index Only Scan using idx_r24_experiment_covering on appointments  (cost=0.43..119569.93 rows=2697700 width=16) (actual time=0.026..196.866 rows=2703682.00 loops=1)
+                 Heap Fetches: 317333
+                 Index Searches: 1
+                 Buffers: shared hit=442072 read=13321
+                 I/O Timings: shared read=22.818
+   ->  Nested Loop  (cost=0.01..2252002000.01 rows=33333333333 width=20) (actual time=0.044..505.927 rows=11308.00 loops=1)
+         Join Filter: (first_index.i < second_index.j)
+         Rows Removed by Join Filter: 33729
+         Buffers: shared hit=442072 read=13321
+         I/O Timings: shared read=22.818
+         ->  Nested Loop  (cost=0.00..2002000.00 rows=100000000 width=48) (actual time=0.040..497.388 rows=22421.00 loops=1)
+               Buffers: shared hit=442072 read=13321
+               I/O Timings: shared read=22.818
+               ->  CTE Scan on duplicate_slots d  (cost=0.00..2000.00 rows=100000 width=44) (actual time=0.036..492.388 rows=11178.00 loops=1)
+                     Storage: Memory  Maximum Storage: 915kB
+                     Buffers: shared hit=442072 read=13321
+                     I/O Timings: shared read=22.818
+               ->  Function Scan on generate_subscripts first_index  (cost=0.00..10.00 rows=1000 width=4) (actual time=0.000..0.000 rows=2.01 loops=11178)
+         ->  Function Scan on generate_subscripts second_index  (cost=0.00..10.00 rows=1000 width=4) (actual time=0.000..0.000 rows=2.01 loops=22421)
+ Settings: work_mem = '64MB', search_path = 'practo'
+ Planning:
+   Buffers: shared hit=450 read=36
+   I/O Timings: shared read=0.197
+ Planning Time: 0.815 ms
+ Execution Time: 507.462 ms
+(37 rows)
+
+ROLLBACK

@@ -1,0 +1,6 @@
+SET
+DO
+ standby | replay_lsn | visible_probe_rows | probe_db_size
+---------+------------+--------------------+---------------
+ t       | 2/91387BE8 |              50000 | 37 MB
+(1 row)

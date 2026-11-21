@@ -1,0 +1,11 @@
+CREATE TABLE
+INSERT 0 50000
+ committed_rows | primary_target_lsn | probe_database_size
+----------------+--------------------+---------------------
+          50000 | 2/91387BB0         | 37 MB
+(1 row)
+
+ application_name |   state   | sync_state |  sent_lsn  | write_lsn  | flush_lsn  | replay_lsn |    write_lag    |    flush_lag    |   replay_lag
+------------------+-----------+------------+------------+------------+------------+------------+-----------------+-----------------+-----------------
+ walreceiver      | streaming | async      | 2/91040000 | 2/91000000 | 2/91000000 | 2/90DB8EC0 | 00:00:00.010288 | 00:00:00.010288 | 00:00:00.067551
+(1 row)

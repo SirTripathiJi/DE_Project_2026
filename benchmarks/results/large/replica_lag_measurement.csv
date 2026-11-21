@@ -1,0 +1,2 @@
+primary_database,primary_port,standby_port,wal_level,replication_mode,probe_rows,payload_bytes,primary_target_lsn,sent_lsn,write_lsn,flush_lsn,replay_lsn,replay_lag_ms,lsn_gap_bytes,standby_visible_rows_after_catchup
+practo_cp4_large_t0035,55441,55442,replica,async,50000,25600000,2/91387BB0,2/91040000,2/91000000,2/91000000,2/90DB8EC0,67.551,6089968,50000

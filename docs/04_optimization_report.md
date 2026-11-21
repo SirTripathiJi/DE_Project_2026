@@ -73,7 +73,7 @@ The original R13 condition was `clinic_id NOT IN (SELECT clinic_id FROM doctor_s
 
 ## Write-query performance and index maintenance
 
-The baseline and optimized averages show the net change for the five write statements, all measured with rollback. The table reports the observed difference; it does not isolate index-maintenance cost from run-to-run and database-state effects.
+The baseline and optimized averages show the net change for the five write statements, all measured with rollback. The table reports the observed difference; it does not by itself isolate index-maintenance cost from run-to-run and database-state effects.
 
 | Query | Baseline mean (ms) | Optimized mean (ms) | Change (ms) | Observed result |
 |---|---:|---:|---:|---|
@@ -84,6 +84,19 @@ The baseline and optimized averages show the net change for the five write state
 | W05 | 6.878 | 0.245 | −6.633 | Faster; the booked-doctor/slot partial index narrows candidate selection. |
 
 The summed averages are 24.086 ms baseline and 7.977 ms optimized, a 3.02× lower total for one execution of each statement. This is a workload before/after comparison, not a controlled estimate of index-only write cost. The full three-run/five-run source measurements remain in the raw plan files and summaries; each write is wrapped in `BEGIN`/`ROLLBACK`.
+
+### Controlled secondary-index write experiment
+
+On 21 November 2026, `benchmarks/measure_index_write_overhead.sql` copied the same 3,000,000 large-data appointments into two session-temporary tables. Both had the same primary key; one had no secondary indexes and the other had the ten appointments indexes from `sql/05_indexes.sql`. Each trial updated the same 5,000 `BOOKED` appointment IDs to `CHECKED_IN` and set `checked_in_at`, using the primary key for row lookup. Each update ran under `EXPLAIN (ANALYZE, BUFFERS)`, was rolled back, and the target table was vacuumed before its next trial. The order was interleaved. Table and index sizes were measured on the two copies.
+
+| Variant | Table bytes | Primary-key index bytes | Secondary-index bytes | Three-run mean (ms) |
+|---|---:|---:|---:|---:|
+| Primary key only | 440,410,112 | 67,403,776 | 0 | 9.845 |
+| Primary key + ten workload indexes | 440,410,112 | 67,403,776 | 951,377,920 | 115.362 |
+
+For this specific 5,000-row status transition, the indexed copy took 105.517 ms more on average (11.72× the primary-key-only time). The identical source rows, primary-key access, update values, row count, and rollback procedure make secondary-index maintenance the controlled difference in this experiment. The raw plans and sizes are in [index_write_overhead.log](../benchmarks/results/large/index_write_overhead.log) and [index_write_overhead.csv](../benchmarks/results/large/index_write_overhead.csv); the repeatable setup is the SQL file above.
+
+This is not a production write-latency estimate: PostgreSQL temporary tables are session-scoped and are not WAL-logged, so WAL, durable commit, replica, and production concurrency costs are excluded ([PostgreSQL temporary tables](https://www.postgresql.org/docs/18/sql-createtable.html)). It isolates the local cost of maintaining these secondary indexes for this update shape; it does not imply the same multiplier for W01–W05. The earlier W-query measurements remain the appropriate net workload results.
 
 ## Index storage compared with table storage
 
@@ -159,6 +172,7 @@ The workload’s measured improvements come with index storage of 74.28 MiB, com
 - Raw plans: `benchmarks/results/baseline/{R01–R25,W01–W05}.txt` and `benchmarks/results/optimized/{R01–R25,W01–W05}.txt`
 - Index definitions: [sql/05_indexes.sql](../sql/05_indexes.sql)
 - Per-index size evidence: [index_storage_detailed.csv](../benchmarks/results/optimized/index_storage_detailed.csv)
+- Controlled secondary-index write experiment: [setup SQL](../benchmarks/measure_index_write_overhead.sql), [raw plans](../benchmarks/results/large/index_write_overhead.log), and [timings and sizes](../benchmarks/results/large/index_write_overhead.csv)
 - Optimized workload: [sql/06_optimized_queries.sql](../sql/06_optimized_queries.sql)
 
 Baseline raw plans contain three runs per query; optimized raw plans contain five. No measurements or missing query timings were filled in or estimated.

@@ -1,0 +1,7 @@
+variant,trial,updated_rows,execution_ms,table_bytes,primary_index_bytes,secondary_index_bytes
+primary_key_only,1,5000,11.571,440410112,67403776,0
+ten_workload_secondary_indexes,1,5000,119.657,440410112,67403776,951377920
+ten_workload_secondary_indexes,2,5000,108.567,440410112,67403776,951377920
+primary_key_only,2,5000,9.017,440410112,67403776,0
+primary_key_only,3,5000,8.946,440410112,67403776,0
+ten_workload_secondary_indexes,3,5000,117.861,440410112,67403776,951377920

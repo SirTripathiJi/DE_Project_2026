@@ -1,0 +1,158 @@
+SET
+SET
+SET
+SELECT 3000000
+SELECT 3000000
+ALTER TABLE
+ALTER TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+ANALYZE
+ANALYZE
+SELECT 5000
+ALTER TABLE
+ fixed_rows_per_trial
+----------------------
+                 5000
+(1 row)
+
+      variant      | table_bytes | all_index_bytes | secondary_index_bytes
+-------------------+-------------+-----------------+-----------------------
+ no_secondary      |   440410112 |        67403776 |                     0
+ with_10_secondary |   440410112 |      1018781696 |             951377920
+(2 rows)
+
+BEGIN
+                                                                           QUERY PLAN
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Update on write_no_secondary t  (cost=0.43..36784.00 rows=0 width=0) (actual time=11.562..11.562 rows=0.00 loops=1)
+   Buffers: local hit=54464 read=789 dirtied=917 written=145
+   ->  Nested Loop  (cost=0.43..36784.00 rows=5000 width=78) (actual time=0.012..3.535 rows=5000.00 loops=1)
+         Buffers: local hit=19287 read=745
+         ->  Seq Scan on write_ids i  (cost=0.00..82.00 rows=5000 width=10) (actual time=0.002..0.180 rows=5000.00 loops=1)
+               Buffers: local hit=32
+         ->  Index Scan using write_no_secondary_pkey on write_no_secondary t  (cost=0.43..7.34 rows=1 width=18) (actual time=0.001..0.001 rows=1.00 loops=5000)
+               Index Cond: (appointment_id = i.appointment_id)
+               Index Searches: 5000
+               Buffers: local hit=19255 read=745
+ Planning:
+   Buffers: shared hit=20, local read=1
+ Planning Time: 0.080 ms
+ Execution Time: 11.571 ms
+(14 rows)
+
+ROLLBACK
+VACUUM
+BEGIN
+                                                                             QUERY PLAN
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Update on write_with_secondary t  (cost=0.43..36784.00 rows=0 width=0) (actual time=119.641..119.641 rows=0.00 loops=1)
+   Buffers: local hit=105043 read=21098 dirtied=18704 written=18345
+   ->  Nested Loop  (cost=0.43..36784.00 rows=5000 width=78) (actual time=0.017..6.397 rows=5000.00 loops=1)
+         Buffers: local hit=19256 read=776 written=563
+         ->  Seq Scan on write_ids i  (cost=0.00..82.00 rows=5000 width=10) (actual time=0.008..0.451 rows=5000.00 loops=1)
+               Buffers: local read=32 written=28
+         ->  Index Scan using write_with_secondary_pkey on write_with_secondary t  (cost=0.43..7.34 rows=1 width=18) (actual time=0.001..0.001 rows=1.00 loops=5000)
+               Index Cond: (appointment_id = i.appointment_id)
+               Index Searches: 5000
+               Buffers: local hit=19256 read=744 written=535
+ Planning:
+   Buffers: shared hit=11, local read=11
+ Planning Time: 0.353 ms
+ Execution Time: 119.657 ms
+(14 rows)
+
+ROLLBACK
+VACUUM
+BEGIN
+                                                                             QUERY PLAN
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Update on write_with_secondary t  (cost=0.43..36808.00 rows=0 width=0) (actual time=108.553..108.554 rows=0.00 loops=1)
+   Buffers: local hit=109166 read=21637 dirtied=18961 written=18384
+   ->  Nested Loop  (cost=0.43..36808.00 rows=5000 width=78) (actual time=0.028..6.595 rows=5000.00 loops=1)
+         Buffers: local hit=19189 read=843 written=625
+         ->  Seq Scan on write_ids i  (cost=0.00..82.00 rows=5000 width=10) (actual time=0.010..0.455 rows=5000.00 loops=1)
+               Buffers: local read=32 written=25
+         ->  Index Scan using write_with_secondary_pkey on write_with_secondary t  (cost=0.43..7.34 rows=1 width=18) (actual time=0.001..0.001 rows=1.00 loops=5000)
+               Index Cond: (appointment_id = i.appointment_id)
+               Index Searches: 5000
+               Buffers: local hit=19189 read=811 written=600
+ Planning:
+   Buffers: shared hit=82, local read=11
+ Planning Time: 0.393 ms
+ Execution Time: 108.567 ms
+(14 rows)
+
+ROLLBACK
+VACUUM
+BEGIN
+                                                                           QUERY PLAN
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Update on write_no_secondary t  (cost=0.43..36808.00 rows=0 width=0) (actual time=9.006..9.007 rows=0.00 loops=1)
+   Buffers: local hit=59180 read=999 dirtied=928 written=69
+   ->  Nested Loop  (cost=0.43..36808.00 rows=5000 width=78) (actual time=0.021..3.769 rows=5000.00 loops=1)
+         Buffers: local hit=19174 read=858 written=13
+         ->  Seq Scan on write_ids i  (cost=0.00..82.00 rows=5000 width=10) (actual time=0.009..0.217 rows=5000.00 loops=1)
+               Buffers: local read=32
+         ->  Index Scan using write_no_secondary_pkey on write_no_secondary t  (cost=0.43..7.34 rows=1 width=18) (actual time=0.001..0.001 rows=1.00 loops=5000)
+               Index Cond: (appointment_id = i.appointment_id)
+               Index Searches: 5000
+               Buffers: local hit=19174 read=826 written=13
+ Planning:
+   Buffers: shared hit=23, local read=1
+ Planning Time: 0.150 ms
+ Execution Time: 9.017 ms
+(14 rows)
+
+ROLLBACK
+VACUUM
+BEGIN
+                                                                           QUERY PLAN
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Update on write_no_secondary t  (cost=0.43..36808.00 rows=0 width=0) (actual time=8.937..8.937 rows=0.00 loops=1)
+   Buffers: local hit=61684 read=842 dirtied=934 written=200
+   ->  Nested Loop  (cost=0.43..36808.00 rows=5000 width=78) (actual time=0.016..3.842 rows=5000.00 loops=1)
+         Buffers: local hit=19283 read=751 written=88
+         ->  Seq Scan on write_ids i  (cost=0.00..82.00 rows=5000 width=10) (actual time=0.008..0.240 rows=5000.00 loops=1)
+               Buffers: local read=32 written=9
+         ->  Index Scan using write_no_secondary_pkey on write_no_secondary t  (cost=0.43..7.34 rows=1 width=18) (actual time=0.001..0.001 rows=1.00 loops=5000)
+               Index Cond: (appointment_id = i.appointment_id)
+               Index Searches: 5000
+               Buffers: local hit=19283 read=719 written=79
+ Planning:
+   Buffers: shared hit=23, local read=1
+ Planning Time: 0.114 ms
+ Execution Time: 8.946 ms
+(14 rows)
+
+ROLLBACK
+VACUUM
+BEGIN
+                                                                             QUERY PLAN
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Update on write_with_secondary t  (cost=0.43..36812.00 rows=0 width=0) (actual time=117.849..117.850 rows=0.00 loops=1)
+   Buffers: local hit=113825 read=22070 dirtied=19133 written=18591
+   ->  Nested Loop  (cost=0.43..36812.00 rows=5000 width=78) (actual time=0.019..6.957 rows=5000.00 loops=1)
+         Buffers: local hit=19169 read=868 written=621
+         ->  Seq Scan on write_ids i  (cost=0.00..82.00 rows=5000 width=10) (actual time=0.010..0.458 rows=5000.00 loops=1)
+               Buffers: local read=32 written=23
+         ->  Index Scan using write_with_secondary_pkey on write_with_secondary t  (cost=0.43..7.34 rows=1 width=18) (actual time=0.001..0.001 rows=1.00 loops=5000)
+               Index Cond: (appointment_id = i.appointment_id)
+               Index Searches: 5000
+               Buffers: local hit=19169 read=836 written=598
+ Planning:
+   Buffers: shared hit=82, local read=11
+ Planning Time: 0.363 ms
+ Execution Time: 117.861 ms
+(14 rows)
+
+ROLLBACK
+VACUUM

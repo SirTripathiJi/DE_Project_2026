@@ -1,0 +1,159 @@
+BEGIN
+SET
+SET
+SET
+SET
+CREATE INDEX
+ experimental_index_size
+-------------------------
+ 105 MB
+(1 row)
+
+                                                                                         QUERY PLAN
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=258064.25..258064.25 rows=1 width=20) (actual time=479.629..479.888 rows=11308.00 loops=1)
+   Sort Key: a.slot_start DESC
+   Sort Method: quicksort  Memory: 826kB
+   Buffers: shared hit=544898 read=22391 written=1
+   I/O Timings: shared read=74.640 write=0.031
+   CTE duplicate_slots
+     ->  GroupAggregate  (cost=0.43..131664.68 rows=100000 width=12) (actual time=1.268..433.512 rows=11178.00 loops=1)
+           Group Key: appointments.doctor_id, appointments.slot_start
+           Filter: (count(*) > 1)
+           Rows Removed by Filter: 2681261
+           Buffers: shared hit=437210 read=15197 written=1
+           I/O Timings: shared read=56.415 write=0.031
+           ->  Index Only Scan using idx_appointments_active_doctor_slot on appointments  (cost=0.43..107681.93 rows=2697700 width=12) (actual time=1.248..254.075 rows=2703682.00 loops=1)
+                 Heap Fetches: 317336
+                 Index Searches: 1
+                 Buffers: shared hit=437210 read=15197 written=1
+                 I/O Timings: shared read=56.415 write=0.031
+   ->  Nested Loop  (cost=0.86..126399.56 rows=1 width=20) (actual time=1.287..478.351 rows=11308.00 loops=1)
+         Buffers: shared hit=544898 read=22391 written=1
+         I/O Timings: shared read=74.640 write=0.031
+         ->  Nested Loop  (cost=0.43..126252.00 rows=300 width=28) (actual time=1.283..464.061 rows=22421.00 loops=1)
+               Buffers: shared hit=471308 read=22333 written=1
+               I/O Timings: shared read=74.507 write=0.031
+               ->  CTE Scan on duplicate_slots d  (cost=0.00..2000.00 rows=100000 width=12) (actual time=1.269..434.526 rows=11178.00 loops=1)
+                     Storage: Memory  Maximum Storage: 565kB
+                     Buffers: shared hit=437210 read=15197 written=1
+                     I/O Timings: shared read=56.415 write=0.031
+               ->  Index Only Scan using idx_r24_experiment_covering on appointments a  (cost=0.43..1.23 rows=1 width=16) (actual time=0.002..0.002 rows=2.01 loops=11178)
+                     Index Cond: ((doctor_id = d.doctor_id) AND (slot_start = d.slot_start))
+                     Heap Fetches: 2561
+                     Index Searches: 11178
+                     Buffers: shared hit=34098 read=7136
+                     I/O Timings: shared read=18.092
+         ->  Index Only Scan using idx_r24_experiment_covering on appointments b  (cost=0.43..0.48 rows=1 width=16) (actual time=0.001..0.001 rows=0.50 loops=22421)
+               Index Cond: ((doctor_id = a.doctor_id) AND (slot_start = a.slot_start) AND (appointment_id > a.appointment_id))
+               Heap Fetches: 1296
+               Index Searches: 22421
+               Buffers: shared hit=73590 read=58
+               I/O Timings: shared read=0.133
+ Settings: search_path = 'practo'
+ Planning:
+   Buffers: shared hit=442 read=8
+   I/O Timings: shared read=2.235
+ Planning Time: 3.132 ms
+ Execution Time: 480.114 ms
+(45 rows)
+
+                                                                                         QUERY PLAN
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=258064.25..258064.25 rows=1 width=20) (actual time=439.089..439.346 rows=11308.00 loops=1)
+   Sort Key: a.slot_start DESC
+   Sort Method: quicksort  Memory: 826kB
+   Buffers: shared hit=550536 read=16753 written=2
+   I/O Timings: shared read=34.870 write=0.023
+   CTE duplicate_slots
+     ->  GroupAggregate  (cost=0.43..131664.68 rows=100000 width=12) (actual time=0.012..397.569 rows=11178.00 loops=1)
+           Group Key: appointments.doctor_id, appointments.slot_start
+           Filter: (count(*) > 1)
+           Rows Removed by Filter: 2681261
+           Buffers: shared hit=442072 read=10335 written=2
+           I/O Timings: shared read=21.472 write=0.023
+           ->  Index Only Scan using idx_appointments_active_doctor_slot on appointments  (cost=0.43..107681.93 rows=2697700 width=12) (actual time=0.008..216.773 rows=2703682.00 loops=1)
+                 Heap Fetches: 317336
+                 Index Searches: 1
+                 Buffers: shared hit=442072 read=10335 written=2
+                 I/O Timings: shared read=21.472 write=0.023
+   ->  Nested Loop  (cost=0.86..126399.56 rows=1 width=20) (actual time=0.018..437.951 rows=11308.00 loops=1)
+         Buffers: shared hit=550536 read=16753 written=2
+         I/O Timings: shared read=34.870 write=0.023
+         ->  Nested Loop  (cost=0.43..126252.00 rows=300 width=28) (actual time=0.016..423.856 rows=22421.00 loops=1)
+               Buffers: shared hit=476919 read=16722 written=2
+               I/O Timings: shared read=34.820 write=0.023
+               ->  CTE Scan on duplicate_slots d  (cost=0.00..2000.00 rows=100000 width=12) (actual time=0.012..398.526 rows=11178.00 loops=1)
+                     Storage: Memory  Maximum Storage: 565kB
+                     Buffers: shared hit=442072 read=10335 written=2
+                     I/O Timings: shared read=21.472 write=0.023
+               ->  Index Only Scan using idx_r24_experiment_covering on appointments a  (cost=0.43..1.23 rows=1 width=16) (actual time=0.002..0.002 rows=2.01 loops=11178)
+                     Index Cond: ((doctor_id = d.doctor_id) AND (slot_start = d.slot_start))
+                     Heap Fetches: 2561
+                     Index Searches: 11178
+                     Buffers: shared hit=34847 read=6387
+                     I/O Timings: shared read=13.348
+         ->  Index Only Scan using idx_r24_experiment_covering on appointments b  (cost=0.43..0.48 rows=1 width=16) (actual time=0.000..0.001 rows=0.50 loops=22421)
+               Index Cond: ((doctor_id = a.doctor_id) AND (slot_start = a.slot_start) AND (appointment_id > a.appointment_id))
+               Heap Fetches: 1296
+               Index Searches: 22421
+               Buffers: shared hit=73617 read=31
+               I/O Timings: shared read=0.049
+ Settings: search_path = 'practo'
+ Planning:
+   Buffers: shared hit=30 read=6
+   I/O Timings: shared read=0.011
+ Planning Time: 0.293 ms
+ Execution Time: 439.559 ms
+(45 rows)
+
+                                                                                         QUERY PLAN
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=258064.25..258064.25 rows=1 width=20) (actual time=437.304..437.553 rows=11308.00 loops=1)
+   Sort Key: a.slot_start DESC
+   Sort Method: quicksort  Memory: 826kB
+   Buffers: shared hit=550313 read=16976
+   I/O Timings: shared read=35.873
+   CTE duplicate_slots
+     ->  GroupAggregate  (cost=0.43..131664.68 rows=100000 width=12) (actual time=0.016..394.126 rows=11178.00 loops=1)
+           Group Key: appointments.doctor_id, appointments.slot_start
+           Filter: (count(*) > 1)
+           Rows Removed by Filter: 2681261
+           Buffers: shared hit=442072 read=10335
+           I/O Timings: shared read=22.125
+           ->  Index Only Scan using idx_appointments_active_doctor_slot on appointments  (cost=0.43..107681.93 rows=2697700 width=12) (actual time=0.011..205.831 rows=2703682.00 loops=1)
+                 Heap Fetches: 317336
+                 Index Searches: 1
+                 Buffers: shared hit=442072 read=10335
+                 I/O Timings: shared read=22.125
+   ->  Nested Loop  (cost=0.86..126399.56 rows=1 width=20) (actual time=0.022..436.116 rows=11308.00 loops=1)
+         Buffers: shared hit=550313 read=16976
+         I/O Timings: shared read=35.873
+         ->  Nested Loop  (cost=0.43..126252.00 rows=300 width=28) (actual time=0.021..420.281 rows=22421.00 loops=1)
+               Buffers: shared hit=476699 read=16942
+               I/O Timings: shared read=35.338
+               ->  CTE Scan on duplicate_slots d  (cost=0.00..2000.00 rows=100000 width=12) (actual time=0.017..395.182 rows=11178.00 loops=1)
+                     Storage: Memory  Maximum Storage: 565kB
+                     Buffers: shared hit=442072 read=10335
+                     I/O Timings: shared read=22.125
+               ->  Index Only Scan using idx_r24_experiment_covering on appointments a  (cost=0.43..1.23 rows=1 width=16) (actual time=0.002..0.002 rows=2.01 loops=11178)
+                     Index Cond: ((doctor_id = d.doctor_id) AND (slot_start = d.slot_start))
+                     Heap Fetches: 2561
+                     Index Searches: 11178
+                     Buffers: shared hit=34627 read=6607
+                     I/O Timings: shared read=13.212
+         ->  Index Only Scan using idx_r24_experiment_covering on appointments b  (cost=0.43..0.48 rows=1 width=16) (actual time=0.001..0.001 rows=0.50 loops=22421)
+               Index Cond: ((doctor_id = a.doctor_id) AND (slot_start = a.slot_start) AND (appointment_id > a.appointment_id))
+               Heap Fetches: 1296
+               Index Searches: 22421
+               Buffers: shared hit=73614 read=34
+               I/O Timings: shared read=0.536
+ Settings: search_path = 'practo'
+ Planning:
+   Buffers: shared hit=28 read=8
+   I/O Timings: shared read=0.535
+ Planning Time: 0.834 ms
+ Execution Time: 437.771 ms
+(45 rows)
+
+ROLLBACK

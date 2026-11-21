@@ -13,7 +13,7 @@ import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-DATA = pathlib.Path("/Users/akshattripathi/Desktop/large_data")
+DATA = ROOT / "large_data"
 PSQL = "/Applications/Postgres.app/Contents/Versions/latest/bin/psql"
 
 

@@ -1,0 +1,4 @@
+candidate,run,rows,index_size,execution_ms
+current_R24_with_transient_partial_covering_index,1,11308,105 MB,480.114
+current_R24_with_transient_partial_covering_index,2,11308,105 MB,439.559
+current_R24_with_transient_partial_covering_index,3,11308,105 MB,437.771

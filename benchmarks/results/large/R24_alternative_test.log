@@ -1,0 +1,60 @@
+BEGIN
+SET
+SET
+SET
+SET
+                                                                                        QUERY PLAN
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=9481926073.09..9565572739.76 rows=33458666667 width=20) (actual time=956.726..956.960 rows=11308.00 loops=1)
+   Sort Key: d.slot_start DESC
+   Sort Method: quicksort  Memory: 826kB
+   Buffers: shared hit=467861 read=33007
+   I/O Timings: shared read=193.905
+   CTE duplicate_slots
+     ->  GroupAggregate  (cost=1.11..275622.04 rows=100376 width=44) (actual time=0.279..939.725 rows=11178.00 loops=1)
+           Group Key: appointments.doctor_id, appointments.slot_start
+           Filter: (count(*) > 1)
+           Rows Removed by Filter: 2681261
+           Buffers: shared hit=467858 read=33007
+           I/O Timings: shared read=193.905
+           ->  Incremental Sort  (cost=1.11..244026.58 rows=2707853 width=16) (actual time=0.266..606.871 rows=2703682.00 loops=1)
+                 Sort Key: appointments.doctor_id, appointments.slot_start, appointments.appointment_id
+                 Presorted Key: appointments.doctor_id, appointments.slot_start
+                 Full-sort Groups: 84480  Sort Method: quicksort  Average Memory: 26kB  Peak Memory: 26kB
+                 Buffers: shared hit=467858 read=33007
+                 I/O Timings: shared read=193.905
+                 ->  Index Only Scan using idx_appointments_doctor_slot on appointments  (cost=0.43..161254.02 rows=2707853 width=16) (actual time=0.251..461.027 rows=2703682.00 loops=1)
+                       Filter: ((status)::text <> 'CANCELLED'::text)
+                       Rows Removed by Filter: 296318
+                       Heap Fetches: 348400
+                       Index Searches: 1
+                       Buffers: shared hit=467855 read=33007
+                       I/O Timings: shared read=193.905
+   ->  Nested Loop  (cost=0.01..2260469527.53 rows=33458666667 width=20) (actual time=0.289..955.482 rows=11308.00 loops=1)
+         Join Filter: (first_index.i < second_index.j)
+         Rows Removed by Join Filter: 33729
+         Buffers: shared hit=467858 read=33007
+         I/O Timings: shared read=193.905
+         ->  Nested Loop  (cost=0.00..2009527.52 rows=100376000 width=48) (actual time=0.285..946.436 rows=22421.00 loops=1)
+               Buffers: shared hit=467858 read=33007
+               I/O Timings: shared read=193.905
+               ->  CTE Scan on duplicate_slots d  (cost=0.00..2007.52 rows=100376 width=44) (actual time=0.280..941.113 rows=11178.00 loops=1)
+                     Storage: Memory  Maximum Storage: 915kB
+                     Buffers: shared hit=467858 read=33007
+                     I/O Timings: shared read=193.905
+               ->  Function Scan on generate_subscripts first_index  (cost=0.00..10.00 rows=1000 width=4) (actual time=0.000..0.000 rows=2.01 loops=11178)
+         ->  Function Scan on generate_subscripts second_index  (cost=0.00..10.00 rows=1000 width=4) (actual time=0.000..0.000 rows=2.01 loops=22421)
+ Settings: work_mem = '64MB', search_path = 'practo'
+ Planning:
+   Buffers: shared hit=481 read=41
+   I/O Timings: shared read=1.810
+ Planning Time: 2.635 ms
+ Execution Time: 957.188 ms
+(45 rows)
+
+ current_rows | candidate_rows | difference_rows
+--------------+----------------+-----------------
+        11308 |          11308 |               0
+(1 row)
+
+ROLLBACK
