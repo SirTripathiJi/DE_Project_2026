@@ -1,153 +1,207 @@
-# Phase 5: Scalability Report
+# CP4 / Phase 5 — Scalability and Large-Data Results
 
-## 1. Objective and growth target
+| Field | Value |
+|---|---|
+| Team | T0035 |
+| Database | `practo_cp4_large_t0035` (disposable local validation database) |
+| PostgreSQL | 18.7 |
+| Measured | 21 November 2026 |
 
-Phase 5 evaluates whether the Phase 4 optimized workload can support the project brief's expected **20× appointment growth**. The seed has 150,000 appointments; the expected large dataset has approximately 3,000,000 appointments. Until faculty releases `large_data.zip`, large-dataset timings, actual growth ratios, and large-dataset storage measurements are **PENDING**. No target is reported as met on the large dataset without a measurement.
+**Status:** Large-data load and benchmark complete; all official mean-time targets pass. A genuine scale-specific regression was reduced and remeasured. Partitioning was tested on populated data. Sharding, replica lag, and cache performance remain design analyses, not experiments.
 
-## 2. Seed baseline and Phase 4 context
+## 1. Scope and reproducibility
 
-The project brief lists 150,000 seed appointments (1 Jan 2025–30 Jun 2026) and 626,367 total rows across 11 tables. The validated counts in `docs/02_schema_design.md` match those figures. The large-data brief estimates approximately 4,862,000 prescription items, 1,945,000 prescriptions, 800,000 patients, and 610,000 doctor schedules, in addition to about 3,000,000 appointments.
+The official large archive was read from `/Users/akshattripathi/Desktop/large_data.zip`; its extracted CSVs remain outside the repository at `/Users/akshattripathi/Desktop/large_data/`. The archive passed `unzip -t`. Python's CSV parser read all 11 files, and each header matched the corresponding seed CSV. The source archive and CSVs were not copied into or committed with the project.
 
-Phase 4's `benchmarks/results/optimized/summary.csv` records averages from five runs of `sql/06_optimized_queries.sql` on the seed database. Those values are used below as the seed timing baseline. The optimization report documents selective/composite/partial indexes, sargable date ranges, the R19 aggregation rewrite, and the R13 `NOT IN` to `NOT EXISTS` correctness fix (R13's result intentionally changes from zero rows to the 292 clinics without schedules). The Phase 4 report notes remaining broad work in R10, R14, R15, R17, R24 and the OFFSET traversal in R22. Phase 4 seed timings do not prove performance on the large dataset.
+The run used the existing isolated PostgreSQL cluster in `.cp4_validation/pgdata`, on port 55441 and its private Unix socket. The database name was checked and found unused before creation. The schema in `sql/01_schema.sql` and all 19 indexes in `sql/05_indexes.sql` were applied. Index validation reported all 19 indexes valid and ready. `ANALYZE` ran after bulk load and after index creation. The database identity, row counts, load logs, index checks, and storage measurements are in `benchmarks/results/large/`.
 
-## 3. Results for all 30 queries
+The benchmark command was the existing runner with the optimized workload:
 
-Large timings and growth ratios are pending because `large_data.zip` has not been released. Target labels reproduce the query groups and limits in `README.md`. “Pending measurement” means no large-data target status can yet be assigned. The explanation column records the existing optimization or the main scale question to investigate; it does not claim that an unmeasured fix has worked.
+```sh
+PGHOST="$PWD/.cp4_validation/socket" PGPORT=55441 PGUSER=akshattripathi \
+  ./benchmarks/run_benchmark.sh practo_cp4_large_t0035 large 3 sql/06_optimized_queries.sql
+```
 
-| Query | Optimized on seed (ms) | Optimized on large (ms) | Growth ratio | Performance target | Target status | Explanation / fix to investigate |
-|---|---:|---:|---:|---|---|---|
-| R01 | 2.476 | PENDING | PENDING | < 250 ms | Pending measurement | Verified-doctor, specialization and city/schedule indexes; inspect selectivity and join rows. |
-| R02 | 0.232 | PENDING | PENDING | < 5 ms | Pending measurement | Doctor schedule primary key; clinic relation is small. |
-| R03 | 0.118 | PENDING | PENDING | < 5 ms | Pending measurement | Partial in-clinic schedule index plus active doctor/slot anti-lookup. |
-| R04 | 0.043 | PENDING | PENDING | < 5 ms | Pending measurement | Patient/status/slot covering index; selective patient lookup. |
-| R05 | 0.033 | PENDING | PENDING | < 5 ms | Pending measurement | Doctor/slot index and half-open time range. |
-| R06 | 0.022 | PENDING | PENDING | < 5 ms | Pending measurement | Unique patient phone lookup. |
-| R07 | 0.041 | PENDING | PENDING | < 5 ms | Pending measurement | Unique prescription appointment lookup and prescription-item primary key. |
-| R08 | 11.302 | PENDING | PENDING | < 5,000 ms | Pending measurement | Date-range index helps, but year aggregate and specialization joins scan/group many rows. |
-| R09 | 2.129 | PENDING | PENDING | < 5,000 ms | Pending measurement | Completed appointment partial index over June window. |
-| R10 | 15.320 | PENDING | PENDING | < 5,000 ms | Pending measurement | Allergy GIN helps filter patients; inspect appointment/prescription/item join volume. |
-| R11 | 1.285 | PENDING | PENDING | < 250 ms | Pending measurement | Follow-up-date index and indexed active-appointment anti-lookup. |
-| R12 | 9.117 | PENDING | PENDING | < 5,000 ms | Pending measurement | Slot-start range index; monthly grouping still processes matching appointments. |
-| R13 | 0.543 | PENDING | PENDING | < 250 ms | Pending measurement | `NOT EXISTS` avoids NULL-sensitive `NOT IN`; clinic/schedule lookup. |
-| R14 | 17.745 | PENDING | PENDING | < 5,000 ms | Pending measurement | Broad review/appointment aggregation; inspect aggregate and join plans. |
-| R15 | 19.516 | PENDING | PENDING | < 5,000 ms | Pending measurement | Broad prescription-item/appointment/specialization aggregation. |
-| R16 | 2.020 | PENDING | PENDING | < 5,000 ms | Pending measurement | Slot-start date range, then clinic fee aggregation. |
-| R17 | 34.336 | PENDING | PENDING | < 5,000 ms | Pending measurement | Completed-slot partial index; patient joins and age/blood-group aggregation. |
-| R18 | 1.903 | PENDING | PENDING | < 250 ms | Pending measurement | Language GIN plus city and clinic schedule predicates. |
-| R19 | 21.123 | PENDING | PENDING | < 5,000 ms | Pending measurement | Aggregates appointments once per doctor; check city-specific working set. |
-| R20 | 1.172 | PENDING | PENDING | < 5,000 ms | Pending measurement | Completed-slot range scan and running total over June rows. |
-| R21 | 0.089 | PENDING | PENDING | < 250 ms | Pending measurement | Partial index for completed, pending payments, ordered by slot. |
-| R22 | 7.867 | PENDING | PENDING | < 250 ms | Pending measurement | Index provides newest-first order, but `OFFSET 100000` still traverses skipped rows. |
-| R23 | 0.023 | PENDING | PENDING | < 5 ms | Pending measurement | Unique registration-number index lookup. |
-| R24 | 20.365 | PENDING | PENDING | < 5,000 ms | Pending measurement | Broad self-join for active same-doctor/same-slot collisions; inspect pair counts and join strategy. |
-| R25 | 13.202 | PENDING | PENDING | < 5,000 ms | Pending measurement | Completed appointments plus primary-specialization grouping. |
-| W01 | 0.644 | PENDING | PENDING | < 5 ms | Pending measurement | Insert-select uses schedule/doctor keys; appointment index maintenance adds write work. |
-| W02 | 0.322 | PENDING | PENDING | < 5 ms | Pending measurement | Booked-slot partial index locates candidate, then primary key update. |
-| W03 | 0.133 | PENDING | PENDING | < 5 ms | Pending measurement | Unique prescription appointment lookup; follow-up index maintenance is a write cost. |
-| W04 | 5.851 | PENDING | PENDING | < 1,000 ms | Pending measurement | Partial unfinished-slot-end index; large eligible update count and WAL need measurement. |
-| W05 | 0.215 | PENDING | PENDING | < 250 ms | Pending measurement | Partial booked doctor/slot index locates affected rows. |
+Each read query was measured with `EXPLAIN (ANALYZE, BUFFERS)` three times. Each write query was measured inside `BEGIN` and `ROLLBACK`; no workload write was allowed to persist. `queries/workload_30.sql` was not changed or run against the large dataset. The final average in `summary.csv` is the arithmetic mean of the three `Execution Time` values in that query's raw plan. The validator independently checked all 30 IDs, raw timings, averages, target labels, and required evidence files; it passed.
 
-Targets above are exactly the Phase 5 groups from the project brief: real-time screens **under 5 ms**, interactive search/tools **under 250 ms**, reports/analytics **under 5,000 ms**, and batch W04 **under 1,000 ms**. The status is pending for every query until the large-data benchmark is run.
+The first benchmark invocation could not access the local socket from the restricted process context and was not treated as timing evidence. The benchmark was then run with local socket access and completed successfully.
 
-## 4. Expected growth analysis (not measured)
+## 2. Large dataset verification
 
-Every classification and reason below is a **hypothesis based on the current SQL shape, indexes, and seed plans**, not a measured growth result. Each of the 30 queries is assigned to exactly one group. Revisit these assignments after the large-data run; “approximately with data volume” means work may rise with the number of rows matched or processed, and does not assert an exact 20× ratio.
+| CSV/table | Source rows | Database rows | Result |
+|---|---:|---:|---|
+| cities | 10 | 10 | PASS |
+| specializations | 15 | 15 | PASS |
+| doctors | 60,000 | 60,000 | PASS |
+| doctor_specializations | 74,000 | 74,000 | PASS |
+| clinics | 30,000 | 30,000 | PASS |
+| doctor_schedules | 609,747 | 609,747 | PASS |
+| patients | 800,000 | 800,000 | PASS |
+| appointments | 3,000,000 | 3,000,000 | PASS |
+| prescriptions | 1,944,432 | 1,944,432 | PASS |
+| prescription_items | 4,861,080 | 4,861,080 | PASS |
+| doctor_reviews | 608,179 | 608,179 | PASS |
 
-### Expected to remain relatively stable (hypothesis)
+All four additional data checks passed: consultation type agrees with clinic presence, every in-clinic appointment matches a doctor's clinic schedule, prescriptions reference completed appointments, and each doctor has exactly one primary specialization. PostgreSQL constraints remained enabled during loading. See `benchmarks/results/large/row_counts.csv` and `load_validation.log`.
 
-- **R02:** one doctor's schedules by the `(doctor_id, weekday, start_time)` primary key; the clinic lookup is against a small reference table.
-- **R03:** one doctor's weekly in-clinic schedules and indexed active appointment probes at candidate slots; output is limited to that doctor's availability.
-- **R04:** one patient's booked appointments via the patient/status/slot index, followed by primary-key lookups.
-- **R05:** one doctor's bounded day range via the doctor/slot index, then patient key lookups.
-- **R06:** exact phone lookup on the patients' unique index.
-- **R07:** one appointment's prescription via its unique appointment key, then prescription items via their composite primary key.
-- **R11:** indexed follow-up-date range followed by appointment-key checks; growth depends on the narrow due-date window rather than a full appointment scan.
-- **R21:** bounded top-100 lookup using the partial completed/pending slot index.
-- **R23:** exact registration-number lookup on the doctors' unique index.
-- **W01:** one schedule and doctor lookup followed by one appointment insert; index maintenance is fixed to the indexes touched by that row.
-- **W02:** locate the earliest eligible booked in-clinic appointment through the booked-slot partial index, then update by primary key.
-- **W03:** update one prescription using its unique appointment lookup; the write also maintains affected prescription indexes.
-- **W05:** one doctor's booked appointments in one day via the partial `(doctor_id, slot_start)` index; runtime depends on that doctor's matching rows, not a whole-table scan.
+## 3. Large-data query targets
 
-### Expected to grow approximately with data volume (hypothesis)
+The target is evaluated against the **three-run mean**, per the faculty brief. `PASS` means mean strictly below the group's limit. All 30 queries have three raw executions; every mean passes. These outcomes do not imply every individual run was below its limit: W04 had one 2,405.404 ms run, while its mean was 945.381 ms against the 1,000 ms mean target.
 
-- **R01:** verified doctor/specialization/city discovery uses indexes and `EXISTS`, but the number of qualifying doctors, clinics, and joined candidates can increase as those relations grow.
-- **R08:** scans the appointments in the 2026 reporting range and groups by specialization/status; more qualifying appointments increase aggregation work.
-- **R09:** processes the June completed-appointment range to calculate per-clinic waiting averages; work follows matching rows.
-- **R10:** allergy GIN narrows patient candidates, but matching appointments, prescriptions, and medicine items still have to be joined and checked.
-- **R12:** the date-range index narrows 2026 appointments, then monthly counts process all matching rows.
-- **R13:** checks clinics against schedule clinic IDs; work follows the clinic and schedule populations (including the clinic scan), not the appointments table.
-- **R14:** aggregates review and appointment rows to rank doctors; the broad input population can increase.
-- **R15:** joins prescription items through prescriptions, appointments, and primary specializations; June items and joins drive the work.
-- **R16:** reads appointments in a June window and aggregates fees by clinic; matching transactions drive the work.
-- **R17:** scans completed appointments in the 2026 range, joins patients, and groups by age and blood group.
-- **R18:** language GIN and city/schedule predicates narrow candidates, while doctor and schedule populations may grow.
-- **R19:** the rewrite aggregates appointments once by doctor; `max(consult_ended_at)` covers all appointments while the June count is conditional, so total appointment rows still drive the grouped input.
-- **R20:** processes completed appointments in June and sorts/groups them for the running total; work follows the month's matching rows.
-- **R25:** scans completed appointments and associates primary specializations before grouping patient/specialization doctor counts.
-- **W04:** the partial index locates unfinished appointments by `slot_end`, but update work and WAL/index changes grow with the number of eligible rows.
+| Query | Mean ms | Target | Outcome | Observed scan nodes (from raw plan) |
+|---|---:|---:|---|---|
+| R01 | 8.233 | <250 ms | PASS | Index Only Scan; Index Scan |
+| R02 | 0.135 | <5 ms | PASS | Index Scan |
+| R03 | 0.332 | <5 ms | PASS | Index Only Scan |
+| R04 | 0.116 | <5 ms | PASS | Index Only Scan; Index Scan |
+| R05 | 0.102 | <5 ms | PASS | Index Only Scan; Index Scan |
+| R06 | 0.130 | <5 ms | PASS | Index Scan |
+| R07 | 0.166 | <5 ms | PASS | Index Scan |
+| R08 | 124.185 | <5,000 ms | PASS | Index Only Scan; Seq Scan |
+| R09 | 76.855 | <5,000 ms | PASS | Index Scan |
+| R10 | 684.276 | <5,000 ms | PASS | Bitmap Heap Scan; Bitmap Index Scan; Index Scan/Only Scan |
+| R11 | 65.003 | <250 ms | PASS | Bitmap Heap Scan; Bitmap Index Scan; Index Scan/Only Scan |
+| R12 | 90.526 | <5,000 ms | PASS | Index Only Scan |
+| R13 | 14.150 | <250 ms | PASS | Seq Scan; Index Only Scan |
+| R14 | 505.020 | <5,000 ms | PASS | Seq Scan |
+| R15 | 366.255 | <5,000 ms | PASS | Seq Scan; Index Only Scan |
+| R16 | 64.225 | <5,000 ms | PASS | Index Only Scan; Seq Scan |
+| R17 | 691.990 | <5,000 ms | PASS | Index Only Scan; Seq Scan |
+| R18 | 83.300 | <250 ms | PASS | Bitmap Heap Scan; Bitmap Index Scan; Seq Scan; Index Only Scan |
+| R19 | 549.582 | <5,000 ms | PASS | Seq Scan; Index Only Scan |
+| R20 | 29.396 | <5,000 ms | PASS | Index Only Scan |
+| R21 | 0.146 | <250 ms | PASS | Index Only Scan |
+| R22 | 8.945 | <250 ms | PASS | Index Only Scan |
+| R23 | 0.124 | <5 ms | PASS | Index Scan |
+| R24 | 562.748 | <5,000 ms | PASS | Index Only Scan |
+| R25 | 356.415 | <5,000 ms | PASS | Index Only Scan; Seq Scan |
+| W01 | 2.876 | <5 ms | PASS | Index Scan |
+| W02 | 0.821 | <5 ms | PASS | Index Only Scan; Index Scan |
+| W03 | 0.209 | <5 ms | PASS | Index Scan |
+| W04 | 945.381 | <1,000 ms | PASS | Index Scan |
+| W05 | 0.122 | <250 ms | PASS | Index Scan |
 
-### Potentially disproportionate growth (hypothesis)
+The complete per-query target mapping, limits, exact scan index names, and PASS/MISS calculations are in `benchmarks/results/large/target_analysis.csv`. Full plans (including loops, actual rows, buffers, and execution times) are `R01.txt` through `R25.txt` and `W01.txt` through `W05.txt`.
 
-- **R22:** the prescribed query keeps `OFFSET 100000 LIMIT 25`. The current fixed offset traverses 100,000 preceding index entries; it is a scale risk because later pages require larger offsets, whose traversal grows with page depth. The fixed query's offset does not itself rise with table size, so disproportionate growth is not claimed without measurement. Keyset pagination is a possible future change only if page semantics and a stable last-seen ordering key are agreed.
-- **R24:** the active-appointment self-join compares rows for the same doctor and slot. If appointment density or collision counts rise, candidate pair comparisons and output can grow faster than the underlying row count. This query is placed only here (not in the approximately proportional group); the seed plan's sequential scan does not establish how the join will behave at large scale.
+### Write-query rollback checks
 
-These expectations do not report what actually happened at 20×. Actual measured growth ratios, query grouping, spills, and target outcomes remain **PENDING**.
+The runner's SQL wrapper places every W01–W05 `EXPLAIN ANALYZE` inside `BEGIN` / `ROLLBACK`. After the runs, a separate read-only check compared the write targets with the original large CSV state. All five comparisons passed. The large source has no row for W01's appointment ID 90000001, no prescription for W03's appointment ID 18872, and no W05 matching doctor/day rows; those statements therefore affected zero rows in this particular dataset. W02 and W04 had eligible data and their post-run states matched source. This proves no changes persisted; it also identifies the three write cases whose update/insert behavior was not exercised against a matching row. Evidence: `rollback_evidence.csv` and `validate_large_write_rollback.py`.
 
-## 5. What may break at scale and investigation method
+## 4. Seed-to-large growth
 
-After loading the large dataset, run the prescribed optimized workload and capture `EXPLAIN (ANALYZE, BUFFERS)` for slow or target-missing queries. Compare actual versus estimated rows, scan nodes, loops, shared hits/reads, temporary reads/writes, sort/hash spill details, and execution time with seed plans. Refresh statistics with `ANALYZE` as required by the project workflow. Check date predicates and index leading columns, join cardinality, OFFSET traversal, and rows touched by writes. For every change, retain before/after plans and re-check results; do not infer a successful fix from an index existing or from seed timings.
+The seed reference is `benchmarks/results/optimized/summary.csv`; it was checked against all 30 corresponding committed raw plan files, each containing five measured runs. The final large averages are compared with those optimized seed averages (not the stale values previously in this report). Ratios are `large mean / seed mean`; the CSV also gives percentage increase. A ratio below 1 means the observed large mean was lower in this run. These ratios are measurements across two database sizes and this hardware/cache state; they are not asymptotic complexity claims.
 
-## 6. Storage analysis
+| Query | Seed mean ms | Large mean ms | Growth ratio |
+|---|---:|---:|---:|
+| R01 | 1.597 | 8.233 | 5.16x |
+| R02 | 0.433 | 0.135 | 0.31x |
+| R03 | 0.091 | 0.332 | 3.65x |
+| R04 | 0.086 | 0.116 | 1.35x |
+| R05 | 0.105 | 0.102 | 0.97x |
+| R06 | 0.022 | 0.130 | 5.91x |
+| R07 | 0.045 | 0.166 | 3.69x |
+| R08 | 12.476 | 124.185 | 9.95x |
+| R09 | 2.472 | 76.855 | 31.09x |
+| R10 | 19.964 | 684.276 | 34.28x |
+| R11 | 1.640 | 65.003 | 39.64x |
+| R12 | 9.751 | 90.526 | 9.28x |
+| R13 | 0.590 | 14.150 | 23.98x |
+| R14 | 19.084 | 505.020 | 26.46x |
+| R15 | 21.484 | 366.255 | 17.05x |
+| R16 | 1.779 | 64.225 | 36.10x |
+| R17 | 32.731 | 691.990 | 21.14x |
+| R18 | 2.659 | 83.300 | 31.33x |
+| R19 | 24.267 | 549.582 | 22.65x |
+| R20 | 1.066 | 29.396 | 27.58x |
+| R21 | 0.094 | 0.146 | 1.55x |
+| R22 | 7.911 | 8.945 | 1.13x |
+| R23 | 0.084 | 0.124 | 1.48x |
+| R24 | 22.223 | 562.748 | 25.32x |
+| R25 | 15.066 | 356.415 | 23.66x |
+| W01 | 0.834 | 2.876 | 3.45x |
+| W02 | 0.245 | 0.821 | 3.35x |
+| W03 | 0.154 | 0.209 | 1.36x |
+| W04 | 6.499 | 945.381 | 145.47x |
+| W05 | 0.245 | 0.122 | 0.50x |
 
-The Phase 4 optimization report records the following seed measurements from its existing `akshattripathi` database. They are historical reported measurements, not a fresh CP5 measurement. The report's figures cover ordinary-table storage and indexes across the 11 Practo tables, not database-wide overhead such as unrelated objects or WAL.
+Most one-row/one-patient lookups remain sub-millisecond. Broad date reports and joins rise substantially but remain within their generous 5-second target. W04 is the main operational concern: the large workload update matched 6,239 rows, its mean is just under the 1-second target, and its three runs varied from 198.743 to 2,405.404 ms. The group target is technically met by the specified mean, but more repetitions on a production-like host would be needed to characterize tail latency. R22's fixed 100,000-row OFFSET remains a page-depth risk; this fixed workload measured 8.945 ms, so it did not miss its current interactive target.
 
-| Measurement | Seed | Large dataset |
-|---|---:|---:|
-| Total database size | PENDING (not reported in Phase 4) | PENDING |
-| Table storage (`pg_table_size`, 11 tables) | 58,302,464 bytes (55.60 MiB), as reported in Phase 4 | PENDING |
-| Index storage (`pg_indexes_size`, 11 tables) | 78,389,248 bytes (74.76 MiB), as reported in Phase 4 | PENDING |
-| Table plus index storage | 136,691,712 bytes (130.36 MiB), as reported in Phase 4 | PENDING |
+Reproduce these values from `growth_analysis.csv`. `analyze_large_results.py` derives both analysis CSVs from the seed and final large summaries.
 
-The previously reported seed index storage is 1.34× table storage. After the large database is prepared, measure total database size and table/index sizes using consistent PostgreSQL size functions on the same scope, and report the actual values. Do not extrapolate storage linearly from the seed: indexes, TOAST, free space, and data distribution affect the result.
+## 5. Scale-specific investigation and correction
 
-## 7. Architecture proposal for 100×
+### R24 duplicate active appointments
 
-The following measured values provide seed-workload context for architectural choices; they are not partitioning, sharding, or replica benchmarks. In the optimized summary, R22 took **7.867 ms** with its fixed 100,000-row offset, R24 took **20.365 ms**, R19 took **21.123 ms**, R05 took **0.033 ms**, R04 took **0.043 ms**, R01 took **2.476 ms**, R14 took **17.745 ms**, R15 took **19.516 ms**, R17 took **34.336 ms**, R08 took **11.302 ms**, and R12 took **9.117 ms**. The Phase 4 report records R19 falling from **4,226.709 ms** to **21.123 ms** after replacing repeated correlated appointment scans with one grouped appointment aggregation; its cited first-run shared-buffer hits fell from **2,611,500** to **3,004**. These values show which access paths already matter on the seed workload; they do not establish large-scale behavior.
+The initial large plan for R24 used a broad sequential scan/self-join pattern and repeated index probes. The raw three-run mean was 2,851.225 ms (from `summary_before_R24_fix.csv`); the plan returned 11,308 rows and reported approximately 7,075,753 shared-buffer hits plus 1,089,633 reads. Its committed seed optimized mean was 22.223 ms, so this was a clear large-scale regression even though the analytics target was not exceeded.
 
-### Appointment partitioning
+The rewrite in `sql/06_optimized_queries.sql` first groups active appointments by `(doctor_id, slot_start)` and retains groups with duplicates, then probes matching appointment rows through the doctor/slot indexes. On the large data, the three-run remeasurement averaged 562.748 ms (454.869–772.948 ms), about **5.07x faster** than the initial large run (80.3% lower mean). The new plan uses the active-doctor-slot index to form duplicate groups once and the doctor-slot covering index for matching rows. Raw before/after plans are `R24_before_fix.txt` and `R24.txt`; the isolated rerun record is in `large_r24_after/`.
 
-For a substantially larger deployment, evaluate **RANGE partitioning of `appointments` by `slot_start`**, with monthly partitions. The seed has 150,000 appointments, and range-driven queries already appear in the measured workload: R05 (0.033 ms), R08 (11.302 ms), R09 (2.129 ms), R12 (9.117 ms), R16 (2.020 ms), R17 (34.336 ms), R20 (1.172 ms), and R22 (7.867 ms). Those seed times alone do not prove partitioning will help; the architectural inference is that bounded time predicates on `slot_start` may prune unrelated months as history grows. R08/R09/R12/R16/R17/R20 and R05/R22 are representative candidates; W04 filters on `slot_end`, not the partition key, so it may still need to visit many partitions. Verify using bounded `slot_start` predicates and `EXPLAIN`; the plan should list only relevant child partitions or show runtime-pruned subplans. A predicate without the partition key may visit many/all partitions. The review DDL is in [`../sql/08_partitioning.sql`](../sql/08_partitioning.sql).
+`benchmark_console.log` is the initial full-workload run, before the R24 change. The final `summary.csv` and `R24.txt` use the separate three-run R24 remeasurement; the original full-run values remain available in `summary_before_R24_fix.csv` and `R24_before_fix.txt`.
 
-The verified seed CSV range is `slot_start` **2025-01-01 12:20:00+05:30** through **2026-07-15 21:45:00+05:30**, whereas `booked_at` is **2025-01-01 00:00:00+05:30** through **2026-06-30 23:54:45+05:30**. These are distinct timestamp ranges. The SQL example has monthly local-time bounds through July 2026 plus DEFAULT; its dates now cover the observed `slot_start` extrema. The database was unavailable during this audit, so these extrema were calculated from all 150,000 rows in `seed_data/appointments.csv`, not from a live query.
+Result preservation was checked with `EXCEPT ALL` in both directions. The original and candidate each returned 11,308 rows, and the multiset difference was zero. The check is recorded in `R24_candidate_test.log`. The fixed query still takes 25.32x its seed mean, so this is an improvement, not evidence of scale-independent runtime.
 
-PostgreSQL requires a partitioned table's primary key or unique constraint to include every partition-key column. Thus a partitioned primary key must include `slot_start`, e.g. `(appointment_id, slot_start)`. That does **not** enforce global uniqueness of `appointment_id` by itself. Foreign keys from `prescriptions` and `doctor_reviews` that currently reference only `appointment_id` also need a deliberate key/reference redesign (for example, carry the partition key in the child relationship or retain a separately enforced global identifier registry). This trade-off must be resolved and validated before a production cutover. The SQL file is a review example only and does not change the existing table.
+No other query exceeded its official mean target; no further index or SQL change was justified by this run. Sequential scans in R14/R15/R19 and a sequential scan of a small reference table in other plans are not by themselves defects: the broad relation/aggregate work can make a sequential scan cheaper. R10 (684.276 ms), R14 (505.020 ms), R17 (691.990 ms), R19 (549.582 ms), and W04 (945.381 ms) deserve monitoring as data grows; current evidence does not show they miss their specified mean targets.
 
-### Sharding comparison
+## 6. Storage
 
-- **City:** R01 measured 2.476 ms and R19 measured 21.123 ms on the seed; both include city-oriented discovery/reporting paths, which makes city locality attractive for those reads. But R04 (0.043 ms) and R05 (0.033 ms) represent patient history and doctor queue paths; a patient's appointments can span cities, so R04/R07/R10/R11/R17 and a doctor's R05 queue can become cross-shard or require duplicated lookup data. The seed timings are not a sharding test.
-- **Doctor:** R02/R03/R05 and W01/W02/W04/W05 have doctor/schedule/slot access patterns; the measured R05 seed time is 0.033 ms. Doctor placement can keep a queue and slot writes local. Patient history across doctors (R04 measured 0.043 ms, plus R07/R10/R11/R17) becomes cross-shard, and city-wide R01/R19 discovery/reports require fan-out.
-- **Patient:** R04's patient/status lookup (0.043 ms on seed), plus R07/R10/R11, supports patient locality and safety-history access. A doctor's queue/availability (R02/R03/R05, with R05 at 0.033 ms) then spans patient shards; city reports and doctor-wide aggregates also need fan-out.
+The large database was measured after loading and applying the CP3 indexes, before adding the partition candidate. The ordinary-table and index scopes cover all 11 base tables. `partition_storage.csv` separately compares only the ordinary appointments relation with the leaves of the populated candidate; database size at this later point includes both sets and all other objects.
 
-No single shard key keeps all measured access patterns local. Choose based on the dominant transaction path, keep small reference data replicated where appropriate, and use coordinated fan-out/aggregation for cross-shard reports. These conclusions are architectural inference from query shapes and seed timings, not measured cross-shard latency; measure fan-out volume and consistency costs before choosing a key.
+| Scope | Table bytes | Index bytes | Table + indexes |
+|---|---:|---:|---:|
+| All 11 ordinary base tables (pre-partition candidate) | 1,141,088,256 | 1,506,361,344 | 2,647,449,600 |
+| Ordinary `appointments` relation | 441,933,824 | 1,021,247,488 | 1,463,181,312 |
+| Populated partitioned appointment leaves | 440,287,232 | 1,306,935,296 | 1,747,222,528 |
+
+The populated partition candidate's table-plus-index total is approximately **19.4% larger** than the ordinary appointment table's measured total. Its leaf data bytes are similar, while its index bytes are higher; the candidate includes the required composite partitioned primary key and the appointment indexes recreated from `sql/05_indexes.sql`. This is a real storage trade-off, not a projected saving. The database size after creating the candidate was 4,409,063,103 bytes. Raw measurements are `storage_measurements.csv`, `table_storage.csv`, `index_sizes.csv`, and `partition_storage.csv`.
+
+## 7. Populated partitioning experiment
+
+`sql/08_partitioning.sql` creates an isolated candidate table, not a replacement for `practo.appointments`. It RANGE partitions on `slot_start` into 19 monthly partitions from January 2025 through July 2026 and a DEFAULT partition, and recreates the ten appointment indexes from the CP3 index design. The existing three-million-row appointments relation was copied into this candidate and analyzed. All 3,000,000 candidate rows landed in the expected monthly partitions; the DEFAULT partition received none. Per-partition counts are in `partition_query_comparison.log`.
+
+For the R05-shaped doctor/day queue, the ordinary and partitioned results had one row each and `EXCEPT ALL` differences of zero in both directions. Three raw `EXPLAIN ANALYZE` executions per table are in `partition_query_comparison.log`. Ordinary-table execution times were 0.009, 0.006, and 0.005 ms; partitioned-table times were 0.007, 0.005, and 0.005 ms. This tiny one-row query does not demonstrate a material speedup; planning and timer granularity dominate at this scale.
+
+A second apples-to-apples check counted the June 2026 appointments through the ordinary parent and partitioned parent, three times each. Both access paths counted the same 167,952 rows. The ordinary table used a parallel index-only scan over the date index (24.785, 12.072, 12.884 ms; mean 16.580 ms); the partitioned table pruned to June and used a parallel sequential scan of that partition (19.633, 10.439, 9.833 ms; mean 13.302 ms). The observed mean was 19.8% lower on this run, with the first execution slower on both paths due to reads. Treat this as a limited single-month count result, not a universal partitioning speedup; raw plans are in `partition_month_comparison.log`.
+
+The populated June 2026 pruning plan scanned only `appointments_partitioned_2026_06`, which contained 167,952 rows, and did not visit the other 18 non-default monthly partitions or DEFAULT. This is direct pruning evidence on populated data. Because the planner selected a sequential scan of that month, execution took 14.274 ms (3,005 shared blocks read); pruning reduced the scanned time range, but this experiment does not prove partitioning beats the best ordinary-table index plan for every workload. The captured plan is also isolated at `partition_pruning.txt`.
+
+### Key and foreign-key limitation
+
+PostgreSQL requires a partitioned primary/unique key to include the partition key. This candidate therefore uses `(appointment_id, slot_start)`. That does not enforce global uniqueness of `appointment_id` by itself. Existing `prescriptions.appointment_id` and `doctor_reviews.appointment_id` references cannot point to this composite key while retaining their current single-column shape. The experiment deliberately leaves those production relationships and the original table untouched. A production conversion needs a separately enforced global ID registry or a reviewed migration that carries the partition key into child references and related joins; dropping the foreign keys or weakening integrity is not acceptable. An ID-only lookup query also cannot identify a partition without the timestamp unless another lookup mechanism is retained.
+
+The SQL and experiment are review evidence, not a production cutover. Monthly partition management must create future partitions ahead of incoming slots and alert on DEFAULT-partition rows.
+
+## 8. Sharding, replicas, caching, and maintenance
+
+These are architecture recommendations informed by this workload's measured large-data behavior; no distributed cluster, replica, or cache was created, so no cross-node speedup or lag is claimed.
+
+### Sharding options
+
+- **City shard:** makes city search and clinic-oriented discovery such as R01 local, but patient histories and doctor queues can span cities. R04/R05 and prescription/safety joins become cross-shard when a patient's doctor or clinic is elsewhere. City-wide reports may still fan out if they compare regions.
+- **Doctor shard:** makes doctor availability/queue and many appointment writes local (R02/R03/R05, W01/W02/W04/W05). Patient history, prescription views, and patient safety queries then fan out across doctors; city discovery and reporting also need aggregation across shards.
+- **Patient shard:** makes patient history and patient-linked prescription/safety reads local (R04/R07/R10/R11). Doctor scheduling, queues, bookings, and doctor-wide reporting must fan out across patient shards.
+
+No single key localizes both patient-centered and doctor-centered flows. The right choice depends on the dominant transaction and the operational cost of fan-out; measure cross-shard request rates and coordination latency before selecting a key. Small reference tables may be replicated if update and consistency rules are explicit.
 
 ### Read replicas and caching
 
-Measured seed examples show the potential read workload: R08 took 11.302 ms, R14 17.745 ms, R15 19.516 ms, R17 34.336 ms, R19 21.123 ms, R24 20.365 ms, and R12 9.117 ms. These reporting/analytics reads (R08/R09/R12/R14–R20/R24/R25) are replica candidates when stale reads are acceptable; R01/R02/R13/R18/R22 are also replica candidates subject to freshness needs. R08/R12/R14/R15/R17/R19 are candidates for cached or refreshed summary results if their refresh interval is acceptable. These are inferences from query type and measured seed cost, not proof of replica/cache benefit.
-
-The slot picker R03, patient and doctor screens R04/R05/R07, sign-in R06, follow-up/safety R10/R11, and payment/support results R21–R23 should use the primary when freshness or authorization matters; R03 in particular must not rely on stale availability for booking decisions. All writes W01–W05 must go to the primary. R01 search can use a replica only if its freshness behavior is acceptable. Replicas may lag; define cache invalidation/freshness rules and do not cache away booking conflicts or authorization-sensitive patient details.
+The large measurements identify expensive read candidates: R10 684.276 ms, R14 505.020 ms, R15 366.255 ms, R17 691.990 ms, R19 549.582 ms, R24 562.748 ms, and R25 356.415 ms. Reporting queries can be routed to an asynchronous replica or served from refreshed summaries only if the acceptable staleness window is defined. This is an architectural recommendation, not an observed replica or cache result. Booking/availability, patient and doctor screens that drive an immediate action, payment state, and all W01–W05 writes need primary-consistent handling. Cache invalidation must never permit conflicting bookings or expose stale authorization-sensitive patient data.
 
 ### Maintenance
 
-Keep autovacuum active and monitor dead tuples and vacuum progress on the high-churn appointments table; tune per-table thresholds only after observing update/delete volume and vacuum behavior. Run `ANALYZE` after bulk loads and ensure statistics remain current. Archive old appointment history only under a retention policy and after considering prescription/review foreign keys, reporting needs, and restore requirements; detach/drop old partitions only after validation and backup. Consider summary tables/materialized views for stable, expensive aggregates (for example monthly counts and finance/quality summaries), with a documented refresh schedule and an acceptable staleness window.
+After bulk load, run `ANALYZE`; for ongoing service, monitor statistics and plan changes, dead tuples, autovacuum progress, and index growth. Appointments and prescriptions receive updates, so autovacuum health and write amplification matter. Consider monthly archive/partition retention only after checking prescription/review relationships, reporting retention, backups, and restore procedures. Materialized summaries can help stable analytics if refresh cost and staleness are measured. The current storage figures provide a baseline for that follow-up; no vacuum, archive, replica-lag, or refresh experiment was part of this run.
 
-## 8. Conclusion and remaining work
+## 9. Evidence index and remaining limitations
 
-The schema, Phase 4 indexes, and seed measurements provide a baseline and a 100× design proposal. Readiness for 20× growth is **not yet proven**. The following Phase 5 work remains pending until faculty releases `large_data.zip`:
+Key artifacts under `benchmarks/results/large/`:
 
-- [ ] Create a separate large-data database; load using the project schema/load workflow, apply `sql/05_indexes.sql`, then run `ANALYZE`.
-- [ ] Run the optimized workload only (not the original 30 queries), with three measured runs per query and writes rolled back; save the prescribed large summary and raw plans.
-- [ ] Fill all large-data timings, calculate large ÷ seed ratios, assign target outcomes, and update each query's measured growth classification.
-- [ ] For target misses or other scale-specific failures, investigate using `EXPLAIN (ANALYZE, BUFFERS)`, apply justified fixes, verify results, and retain before/after large-data plans. All actual failures and fixes are currently **PENDING**.
-- [ ] Measure total database size and table/index sizes on the large dataset using consistent scopes/functions; compare with the reported seed measurements. Large-data storage is **PENDING**.
-- [ ] Reassess partition pruning and the architecture proposal against the measured large workload, then state readiness and remaining risks. Before/after large-data plans are **PENDING**.
+- `summary.csv`, `R01.txt`–`R25.txt`, `W01.txt`–`W05.txt`: final 30-query measurements and raw plans.
+- `summary_before_R24_fix.csv`, `R24_before_fix.txt`, `R24.txt`, and `large_r24_after/`: R24 before/after evidence.
+- `R24_candidate_test.sql` / `.log`: result-equivalence comparison.
+- `row_counts.csv`, `load_validation.log`, `load_data.log`, `schema_apply.log`, `index_application.log`, `index_validation.log`: load, integrity, and index checks.
+- `rollback_evidence.csv`: post-benchmark write-state comparisons.
+- `growth_analysis.csv`, `target_analysis.csv`: derived growth and target tables.
+- `storage_measurements.csv`, `table_storage.csv`, `index_sizes.csv`, `partition_storage.csv`: storage evidence and scopes.
+- `partition_population.log`, `partition_query_comparison.sql` / `.log`, `partition_month_comparison.sql` / `.log`, `partition_pruning.txt`, `partition_ddl_setup.log`: populated partition evidence.
+- `dataset_metadata.json`, `seed_reference_validation.txt`: dataset and seed-source validation.
+
+The large-data run, all 30 target averages, row counts, four integrity checks, and populated pruning are verified. The three no-match write cases are a workload-data limitation, W04 has substantial run-to-run variation, R24 still grows substantially relative to seed, partitioned foreign-key/global-ID migration remains unresolved by design, and sharding/replica/cache benefits have not been experimentally measured. These limits are stated rather than inferred away.

@@ -1,0 +1,39 @@
+SET
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+                                                                                                    QUERY PLAN                                                                                                    
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Index Only Scan using appointments_partitioned_2026_slot_start_appointment_id_pa_idx5 on practo.appointments_partitioned_2026_06 appointments_partitioned  (cost=0.15..8.17 rows=1 width=78)
+   Output: appointments_partitioned.appointment_id, appointments_partitioned.patient_id, appointments_partitioned.doctor_id, appointments_partitioned.slot_start, appointments_partitioned.status
+   Index Cond: ((appointments_partitioned.slot_start >= '2026-06-01 00:00:00+05:30'::timestamp with time zone) AND (appointments_partitioned.slot_start < '2026-07-01 00:00:00+05:30'::timestamp with time zone))
+(3 rows)
+

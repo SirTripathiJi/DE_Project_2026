@@ -1,0 +1,84 @@
+=== R12 run 1 ===
+Sort  (cost=76275.42..76358.42 rows=33200 width=25) (actual time=96.859..98.071 rows=14.00 loops=1)
+  Sort Key: (date_trunc('month'::text, slot_start)), consult_type
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=90 read=10945
+  ->  Finalize HashAggregate  (cost=73367.28..73782.28 rows=33200 width=25) (actual time=96.723..98.057 rows=14.00 loops=1)
+        Group Key: (date_trunc('month'::text, slot_start)), consult_type
+        Batches: 1  Memory Usage: 1057kB
+        Buffers: shared hit=84 read=10945
+        ->  Gather  (cost=64386.68..72769.68 rows=79680 width=25) (actual time=96.442..97.897 rows=42.00 loops=1)
+              Workers Planned: 2
+              Workers Launched: 2
+              Buffers: shared hit=84 read=10945
+              ->  Partial HashAggregate  (cost=63386.68..63801.68 rows=33200 width=25) (actual time=94.977..95.151 rows=14.00 loops=3)
+                    Group Key: date_trunc('month'::text, slot_start), consult_type
+                    Batches: 1  Memory Usage: 1057kB
+                    Buffers: shared hit=84 read=10945
+                    Worker 0:  Batches: 1  Memory Usage: 1057kB
+                    Worker 1:  Batches: 1  Memory Usage: 1057kB
+                    ->  Parallel Index Only Scan using idx_appointments_slot_start on appointments  (cost=0.43..60145.86 rows=432109 width=17) (actual time=0.040..66.934 rows=343238.67 loops=3)
+                          Index Cond: ((slot_start >= '2026-01-01 00:00:00+05:30'::timestamp with time zone) AND (slot_start < '2027-01-01 00:00:00+05:30'::timestamp with time zone))
+                          Heap Fetches: 0
+                          Index Searches: 1
+                          Buffers: shared hit=84 read=10945
+Planning:
+  Buffers: shared hit=393 read=4
+Planning Time: 0.796 ms
+Execution Time: 98.283 ms
+=== R12 run 2 ===
+Sort  (cost=76275.42..76358.42 rows=33200 width=25) (actual time=92.622..94.282 rows=14.00 loops=1)
+  Sort Key: (date_trunc('month'::text, slot_start)), consult_type
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=975 read=10060
+  ->  Finalize HashAggregate  (cost=73367.28..73782.28 rows=33200 width=25) (actual time=92.485..94.269 rows=14.00 loops=1)
+        Group Key: (date_trunc('month'::text, slot_start)), consult_type
+        Batches: 1  Memory Usage: 1057kB
+        Buffers: shared hit=969 read=10060
+        ->  Gather  (cost=64386.68..72769.68 rows=79680 width=25) (actual time=92.279..94.123 rows=42.00 loops=1)
+              Workers Planned: 2
+              Workers Launched: 2
+              Buffers: shared hit=969 read=10060
+              ->  Partial HashAggregate  (cost=63386.68..63801.68 rows=33200 width=25) (actual time=90.457..90.588 rows=14.00 loops=3)
+                    Group Key: date_trunc('month'::text, slot_start), consult_type
+                    Batches: 1  Memory Usage: 1057kB
+                    Buffers: shared hit=969 read=10060
+                    Worker 0:  Batches: 1  Memory Usage: 1057kB
+                    Worker 1:  Batches: 1  Memory Usage: 1057kB
+                    ->  Parallel Index Only Scan using idx_appointments_slot_start on appointments  (cost=0.43..60145.86 rows=432109 width=17) (actual time=0.046..62.726 rows=343238.67 loops=3)
+                          Index Cond: ((slot_start >= '2026-01-01 00:00:00+05:30'::timestamp with time zone) AND (slot_start < '2027-01-01 00:00:00+05:30'::timestamp with time zone))
+                          Heap Fetches: 0
+                          Index Searches: 1
+                          Buffers: shared hit=969 read=10060
+Planning:
+  Buffers: shared hit=379 read=18
+Planning Time: 0.670 ms
+Execution Time: 94.497 ms
+=== R12 run 3 ===
+Sort  (cost=76275.42..76358.42 rows=33200 width=25) (actual time=77.494..78.600 rows=14.00 loops=1)
+  Sort Key: (date_trunc('month'::text, slot_start)), consult_type
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=11034
+  ->  Finalize HashAggregate  (cost=73367.28..73782.28 rows=33200 width=25) (actual time=77.355..78.584 rows=14.00 loops=1)
+        Group Key: (date_trunc('month'::text, slot_start)), consult_type
+        Batches: 1  Memory Usage: 1057kB
+        Buffers: shared hit=11028
+        ->  Gather  (cost=64386.68..72769.68 rows=79680 width=25) (actual time=77.151..78.439 rows=42.00 loops=1)
+              Workers Planned: 2
+              Workers Launched: 2
+              Buffers: shared hit=11028
+              ->  Partial HashAggregate  (cost=63386.68..63801.68 rows=33200 width=25) (actual time=75.734..75.864 rows=14.00 loops=3)
+                    Group Key: date_trunc('month'::text, slot_start), consult_type
+                    Batches: 1  Memory Usage: 1057kB
+                    Buffers: shared hit=11028
+                    Worker 0:  Batches: 1  Memory Usage: 1057kB
+                    Worker 1:  Batches: 1  Memory Usage: 1057kB
+                    ->  Parallel Index Only Scan using idx_appointments_slot_start on appointments  (cost=0.43..60145.86 rows=432109 width=17) (actual time=0.019..49.955 rows=343238.67 loops=3)
+                          Index Cond: ((slot_start >= '2026-01-01 00:00:00+05:30'::timestamp with time zone) AND (slot_start < '2027-01-01 00:00:00+05:30'::timestamp with time zone))
+                          Heap Fetches: 0
+                          Index Searches: 1
+                          Buffers: shared hit=11028
+Planning:
+  Buffers: shared hit=397
+Planning Time: 0.688 ms
+Execution Time: 78.798 ms

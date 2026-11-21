@@ -1,0 +1,36 @@
+=== W04 run 1 ===
+Update on appointments  (cost=0.29..445.13 rows=0 width=0) (actual time=2405.355..2405.355 rows=0.00 loops=1)
+  Buffers: shared hit=132468 read=22711 dirtied=23404 written=6761
+  ->  Index Scan using idx_appointments_unfinished_slot_end on appointments  (cost=0.29..445.13 rows=7566 width=64) (actual time=0.014..13.483 rows=6239.00 loops=1)
+        Index Cond: (slot_end < '2026-07-02 00:00:00+05:30'::timestamp with time zone)
+        Filter: ((consult_ended_at IS NULL) AND ((status)::text = ANY ('{BOOKED,CHECKED_IN}'::text[])))
+        Index Searches: 1
+        Buffers: shared hit=4076 read=1578 written=286
+Planning:
+  Buffers: shared hit=412
+Planning Time: 0.569 ms
+Execution Time: 2405.404 ms
+=== W04 run 2 ===
+Update on appointments  (cost=0.29..445.15 rows=0 width=0) (actual time=231.948..231.948 rows=0.00 loops=1)
+  Buffers: shared hit=137190 read=20660 dirtied=20840 written=20797
+  ->  Index Scan using idx_appointments_unfinished_slot_end on appointments  (cost=0.29..445.15 rows=7567 width=64) (actual time=0.012..9.617 rows=6239.00 loops=1)
+        Index Cond: (slot_end < '2026-07-02 00:00:00+05:30'::timestamp with time zone)
+        Filter: ((consult_ended_at IS NULL) AND ((status)::text = ANY ('{BOOKED,CHECKED_IN}'::text[])))
+        Index Searches: 1
+        Buffers: shared hit=5213 read=437 dirtied=348 written=429
+Planning:
+  Buffers: shared hit=412
+Planning Time: 0.616 ms
+Execution Time: 231.997 ms
+=== W04 run 3 ===
+Update on appointments  (cost=0.29..445.45 rows=0 width=0) (actual time=198.692..198.692 rows=0.00 loops=1)
+  Buffers: shared hit=142224 read=17168 dirtied=15148 written=16663
+  ->  Index Scan using idx_appointments_unfinished_slot_end on appointments  (cost=0.29..445.45 rows=7581 width=64) (actual time=0.027..9.009 rows=6239.00 loops=1)
+        Index Cond: (slot_end < '2026-07-02 00:00:00+05:30'::timestamp with time zone)
+        Filter: ((consult_ended_at IS NULL) AND ((status)::text = ANY ('{BOOKED,CHECKED_IN}'::text[])))
+        Index Searches: 1
+        Buffers: shared hit=5291 read=359 dirtied=302 written=347
+Planning:
+  Buffers: shared hit=381 read=31 written=31
+Planning Time: 0.940 ms
+Execution Time: 198.743 ms

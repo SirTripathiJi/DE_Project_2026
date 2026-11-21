@@ -1,0 +1,45 @@
+=== R02 run 1 ===
+Nested Loop Left Join  (cost=0.71..117.47 rows=11 width=56) (actual time=0.294..0.305 rows=9.00 loops=1)
+  Buffers: shared hit=18 read=5
+  ->  Index Scan using pk_doctor_schedules on doctor_schedules sc  (cost=0.42..26.12 rows=11 width=28) (actual time=0.173..0.180 rows=9.00 loops=1)
+        Index Cond: (doctor_id = 217)
+        Index Searches: 1
+        Buffers: shared hit=2 read=3
+  ->  Index Scan using clinics_pkey on clinics c  (cost=0.29..8.30 rows=1 width=31) (actual time=0.013..0.013 rows=0.67 loops=9)
+        Index Cond: (clinic_id = sc.clinic_id)
+        Index Searches: 6
+        Buffers: shared hit=16 read=2
+Planning:
+  Buffers: shared hit=235
+Planning Time: 0.405 ms
+Execution Time: 0.326 ms
+=== R02 run 2 ===
+Nested Loop Left Join  (cost=0.71..117.47 rows=11 width=56) (actual time=0.012..0.017 rows=9.00 loops=1)
+  Buffers: shared hit=23
+  ->  Index Scan using pk_doctor_schedules on doctor_schedules sc  (cost=0.42..26.12 rows=11 width=28) (actual time=0.006..0.008 rows=9.00 loops=1)
+        Index Cond: (doctor_id = 217)
+        Index Searches: 1
+        Buffers: shared hit=5
+  ->  Index Scan using clinics_pkey on clinics c  (cost=0.29..8.30 rows=1 width=31) (actual time=0.001..0.001 rows=0.67 loops=9)
+        Index Cond: (clinic_id = sc.clinic_id)
+        Index Searches: 6
+        Buffers: shared hit=18
+Planning:
+  Buffers: shared hit=235
+Planning Time: 0.406 ms
+Execution Time: 0.039 ms
+=== R02 run 3 ===
+Nested Loop Left Join  (cost=0.71..117.47 rows=11 width=56) (actual time=0.013..0.018 rows=9.00 loops=1)
+  Buffers: shared hit=23
+  ->  Index Scan using pk_doctor_schedules on doctor_schedules sc  (cost=0.42..26.12 rows=11 width=28) (actual time=0.007..0.009 rows=9.00 loops=1)
+        Index Cond: (doctor_id = 217)
+        Index Searches: 1
+        Buffers: shared hit=5
+  ->  Index Scan using clinics_pkey on clinics c  (cost=0.29..8.30 rows=1 width=31) (actual time=0.001..0.001 rows=0.67 loops=9)
+        Index Cond: (clinic_id = sc.clinic_id)
+        Index Searches: 6
+        Buffers: shared hit=18
+Planning:
+  Buffers: shared hit=235
+Planning Time: 0.455 ms
+Execution Time: 0.041 ms

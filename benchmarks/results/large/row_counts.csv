@@ -1,0 +1,12 @@
+table,expected_rows,actual_rows,passed
+appointments,3000000,3000000,true
+cities,10,10,true
+clinics,30000,30000,true
+doctor_reviews,608179,608179,true
+doctor_schedules,609747,609747,true
+doctor_specializations,74000,74000,true
+doctors,60000,60000,true
+patients,800000,800000,true
+prescription_items,4861080,4861080,true
+prescriptions,1944432,1944432,true
+specializations,15,15,true

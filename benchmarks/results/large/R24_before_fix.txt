@@ -1,0 +1,84 @@
+=== R24 run 1 ===
+Gather Merge  (cost=638024.18..638406.42 rows=3282 width=20) (actual time=3055.829..3058.958 rows=11308.00 loops=1)
+  Workers Planned: 2
+  Workers Launched: 2
+  Buffers: shared hit=7075753 read=1089633
+  ->  Sort  (cost=637024.16..637027.58 rows=1368 width=20) (actual time=3054.307..3054.396 rows=3769.33 loops=3)
+        Sort Key: a.slot_start DESC
+        Sort Method: quicksort  Memory: 243kB
+        Buffers: shared hit=7075753 read=1089633
+        Worker 0:  Sort Method: quicksort  Memory: 241kB
+        Worker 1:  Sort Method: quicksort  Memory: 247kB
+        ->  Nested Loop  (cost=0.43..636952.90 rows=1368 width=20) (actual time=18.770..3053.041 rows=3769.33 loops=3)
+              Buffers: shared hit=7075737 read=1089633
+              ->  Parallel Seq Scan on appointments a  (cost=0.00..69353.64 rows=1124088 width=16) (actual time=0.039..123.039 rows=901227.33 loops=3)
+                    Filter: ((status)::text <> 'CANCELLED'::text)
+                    Rows Removed by Filter: 98773
+                    Buffers: shared read=53728
+              ->  Index Only Scan using idx_appointments_doctor_slot on appointments b  (cost=0.43..0.49 rows=1 width=16) (actual time=0.003..0.003 rows=0.00 loops=2703682)
+                    Index Cond: ((doctor_id = a.doctor_id) AND (slot_start = a.slot_start))
+                    Filter: (((status)::text <> 'CANCELLED'::text) AND (appointment_id > a.appointment_id))
+                    Rows Removed by Filter: 1
+                    Heap Fetches: 0
+                    Index Searches: 2703682
+                    Buffers: shared hit=7075737 read=1035905
+Planning:
+  Buffers: shared hit=531 read=2
+Planning Time: 1.145 ms
+Execution Time: 3059.210 ms
+=== R24 run 2 ===
+Gather Merge  (cost=638024.18..638406.42 rows=3282 width=20) (actual time=2747.339..2749.979 rows=11308.00 loops=1)
+  Workers Planned: 2
+  Workers Launched: 2
+  Buffers: shared hit=7084134 read=1081252
+  ->  Sort  (cost=637024.16..637027.58 rows=1368 width=20) (actual time=2739.703..2739.786 rows=3769.33 loops=3)
+        Sort Key: a.slot_start DESC
+        Sort Method: quicksort  Memory: 245kB
+        Buffers: shared hit=7084134 read=1081252
+        Worker 0:  Sort Method: quicksort  Memory: 243kB
+        Worker 1:  Sort Method: quicksort  Memory: 243kB
+        ->  Nested Loop  (cost=0.43..636952.90 rows=1368 width=20) (actual time=0.985..2738.332 rows=3769.33 loops=3)
+              Buffers: shared hit=7084118 read=1081252
+              ->  Parallel Seq Scan on appointments a  (cost=0.00..69353.64 rows=1124088 width=16) (actual time=0.046..126.399 rows=901227.33 loops=3)
+                    Filter: ((status)::text <> 'CANCELLED'::text)
+                    Rows Removed by Filter: 98773
+                    Buffers: shared read=53728
+              ->  Index Only Scan using idx_appointments_doctor_slot on appointments b  (cost=0.43..0.49 rows=1 width=16) (actual time=0.003..0.003 rows=0.00 loops=2703682)
+                    Index Cond: ((doctor_id = a.doctor_id) AND (slot_start = a.slot_start))
+                    Filter: (((status)::text <> 'CANCELLED'::text) AND (appointment_id > a.appointment_id))
+                    Rows Removed by Filter: 1
+                    Heap Fetches: 0
+                    Index Searches: 2703682
+                    Buffers: shared hit=7084118 read=1027524
+Planning:
+  Buffers: shared hit=483 read=50
+Planning Time: 2.190 ms
+Execution Time: 2750.226 ms
+=== R24 run 3 ===
+Gather Merge  (cost=638024.18..638406.42 rows=3282 width=20) (actual time=2740.864..2743.972 rows=11308.00 loops=1)
+  Workers Planned: 2
+  Workers Launched: 2
+  Buffers: shared hit=7084170 read=1081216
+  ->  Sort  (cost=637024.16..637027.58 rows=1368 width=20) (actual time=2732.238..2732.337 rows=3769.33 loops=3)
+        Sort Key: a.slot_start DESC
+        Sort Method: quicksort  Memory: 244kB
+        Buffers: shared hit=7084170 read=1081216
+        Worker 0:  Sort Method: quicksort  Memory: 246kB
+        Worker 1:  Sort Method: quicksort  Memory: 242kB
+        ->  Nested Loop  (cost=0.43..636952.90 rows=1368 width=20) (actual time=0.898..2730.857 rows=3769.33 loops=3)
+              Buffers: shared hit=7084154 read=1081216
+              ->  Parallel Seq Scan on appointments a  (cost=0.00..69353.64 rows=1124088 width=16) (actual time=0.037..124.762 rows=901227.33 loops=3)
+                    Filter: ((status)::text <> 'CANCELLED'::text)
+                    Rows Removed by Filter: 98773
+                    Buffers: shared read=53728
+              ->  Index Only Scan using idx_appointments_doctor_slot on appointments b  (cost=0.43..0.49 rows=1 width=16) (actual time=0.003..0.003 rows=0.00 loops=2703682)
+                    Index Cond: ((doctor_id = a.doctor_id) AND (slot_start = a.slot_start))
+                    Filter: (((status)::text <> 'CANCELLED'::text) AND (appointment_id > a.appointment_id))
+                    Rows Removed by Filter: 1
+                    Heap Fetches: 0
+                    Index Searches: 2703682
+                    Buffers: shared hit=7084154 read=1027488
+Planning:
+  Buffers: shared hit=483 read=50
+Planning Time: 1.258 ms
+Execution Time: 2744.239 ms

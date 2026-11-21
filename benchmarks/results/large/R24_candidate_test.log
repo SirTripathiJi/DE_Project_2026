@@ -1,0 +1,57 @@
+SET
+                                                                                            QUERY PLAN                                                                                            
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=264132.99..264133.00 rows=1 width=20) (actual time=1011.672..1011.933 rows=11308.00 loops=1)
+   Output: a.doctor_id, a.slot_start, a.appointment_id, b.appointment_id
+   Sort Key: a.slot_start DESC
+   Sort Method: quicksort  Memory: 826kB
+   Buffers: shared hit=574269 read=22000 dirtied=5955 written=3705
+   CTE duplicate_slots
+     ->  GroupAggregate  (cost=0.43..107025.02 rows=100376 width=12) (actual time=0.033..930.308 rows=11178.00 loops=1)
+           Output: appointments.doctor_id, appointments.slot_start
+           Group Key: appointments.doctor_id, appointments.slot_start
+           Filter: (count(*) > 1)
+           Rows Removed by Filter: 2681261
+           Buffers: shared hit=463198 read=13534 dirtied=5921 written=2098
+           ->  Index Only Scan using idx_appointments_active_doctor_slot on practo.appointments  (cost=0.43..82952.01 rows=2707853 width=12) (actual time=0.020..743.322 rows=2703682.00 loops=1)
+                 Output: appointments.doctor_id, appointments.slot_start
+                 Heap Fetches: 336056
+                 Index Searches: 1
+                 Buffers: shared hit=463198 read=13534 dirtied=5921 written=2098
+   ->  Nested Loop  (cost=0.86..157107.96 rows=1 width=20) (actual time=0.101..1010.229 rows=11308.00 loops=1)
+         Output: a.doctor_id, a.slot_start, a.appointment_id, b.appointment_id
+         Buffers: shared hit=574266 read=22000 dirtied=5955 written=3705
+         ->  Nested Loop  (cost=0.43..156955.42 rows=302 width=28) (actual time=0.042..989.418 rows=22421.00 loops=1)
+               Output: d.doctor_id, d.slot_start, a.doctor_id, a.slot_start, a.appointment_id
+               Buffers: shared hit=496308 read=21897 dirtied=5921 written=3687
+               ->  CTE Scan on duplicate_slots d  (cost=0.00..2007.52 rows=100376 width=12) (actual time=0.035..931.642 rows=11178.00 loops=1)
+                     Output: d.doctor_id, d.slot_start
+                     Storage: Memory  Maximum Storage: 565kB
+                     Buffers: shared hit=463198 read=13534 dirtied=5921 written=2098
+               ->  Index Only Scan using idx_appointments_doctor_slot on practo.appointments a  (cost=0.43..1.53 rows=1 width=16) (actual time=0.005..0.005 rows=2.01 loops=11178)
+                     Output: a.doctor_id, a.slot_start, a.appointment_id, a.patient_id, a.status, a.checked_in_at, a.clinic_id
+                     Index Cond: ((a.doctor_id = d.doctor_id) AND (a.slot_start = d.slot_start))
+                     Filter: ((a.status)::text <> 'CANCELLED'::text)
+                     Rows Removed by Filter: 0
+                     Heap Fetches: 2762
+                     Index Searches: 11178
+                     Buffers: shared hit=33110 read=8363 written=1589
+         ->  Index Only Scan using idx_appointments_doctor_slot on practo.appointments b  (cost=0.43..0.50 rows=1 width=16) (actual time=0.001..0.001 rows=0.50 loops=22421)
+               Output: b.doctor_id, b.slot_start, b.appointment_id, b.patient_id, b.status, b.checked_in_at, b.clinic_id
+               Index Cond: ((b.doctor_id = a.doctor_id) AND (b.slot_start = a.slot_start))
+               Filter: (((b.status)::text <> 'CANCELLED'::text) AND (b.appointment_id > a.appointment_id))
+               Rows Removed by Filter: 2
+               Heap Fetches: 5351
+               Index Searches: 22421
+               Buffers: shared hit=77958 read=103 dirtied=34 written=18
+ Planning:
+   Buffers: shared hit=466 read=7 dirtied=1
+ Planning Time: 2.312 ms
+ Execution Time: 1012.185 ms
+(47 rows)
+
+ original_rows | candidate_rows | multiset_difference_rows 
+---------------+----------------+--------------------------
+         11308 |          11308 |                        0
+(1 row)
+

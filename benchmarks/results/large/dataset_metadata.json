@@ -1,0 +1,22 @@
+{
+  "source_archive": "/Users/akshattripathi/Desktop/large_data.zip",
+  "source_directory": "/Users/akshattripathi/Desktop/large_data",
+  "verified_at": "2026-11-21",
+  "csv_files": 11,
+  "headers_match_seed": true,
+  "csv_parser_validation": "Python csv.reader parsed every row; each header compared to seed",
+  "archive_integrity": "unzip -t passed",
+  "row_counts": {
+    "cities.csv": 10,
+    "specializations.csv": 15,
+    "doctors.csv": 60000,
+    "doctor_specializations.csv": 74000,
+    "clinics.csv": 30000,
+    "doctor_schedules.csv": 609747,
+    "patients.csv": 800000,
+    "appointments.csv": 3000000,
+    "prescriptions.csv": 1944432,
+    "prescription_items.csv": 4861080,
+    "doctor_reviews.csv": 608179
+  }
+}

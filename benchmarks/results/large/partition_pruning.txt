@@ -1,0 +1,13 @@
+POPULATED PARTITION PRUNING: bounded June 2026 range
+                                                                                                  QUERY PLAN                                                                                                  
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Seq Scan on practo.appointments_partitioned_2026_06 appointments_partitioned  (cost=0.00..5527.28 rows=167952 width=29) (actual time=0.018..11.264 rows=167952.00 loops=1)
+   Output: appointments_partitioned.appointment_id, appointments_partitioned.patient_id, appointments_partitioned.doctor_id, appointments_partitioned.slot_start, appointments_partitioned.status
+   Filter: ((appointments_partitioned.slot_start >= '2026-06-01 00:00:00+05:30'::timestamp with time zone) AND (appointments_partitioned.slot_start < '2026-07-01 00:00:00+05:30'::timestamp with time zone))
+   Buffers: shared hit=3 read=3005 written=55
+ Planning:
+   Buffers: shared hit=8 read=3
+ Planning Time: 0.062 ms
+ Execution Time: 14.274 ms
+(8 rows)
+

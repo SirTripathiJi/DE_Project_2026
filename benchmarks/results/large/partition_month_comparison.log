@@ -1,0 +1,180 @@
+SET
+ORDINARY TABLE: count appointments in June 2026, three executions
+                                                                                                 QUERY PLAN                                                                                                 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=11023.58..11023.59 rows=1 width=8) (actual time=23.343..24.755 rows=1.00 loops=1)
+   Output: count(*)
+   Buffers: shared hit=49604 read=1791
+   ->  Gather  (cost=11023.36..11023.57 rows=2 width=8) (actual time=23.236..24.750 rows=3.00 loops=1)
+         Output: (PARTIAL count(*))
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=49604 read=1791
+         ->  Partial Aggregate  (cost=10023.36..10023.37 rows=1 width=8) (actual time=21.350..21.351 rows=1.00 loops=3)
+               Output: PARTIAL count(*)
+               Buffers: shared hit=49604 read=1791
+               Worker 0:  actual time=20.457..20.457 rows=1.00 loops=1
+                 Buffers: shared hit=15228 read=586
+               Worker 1:  actual time=20.450..20.450 rows=1.00 loops=1
+                 Buffers: shared hit=15180 read=569
+               ->  Parallel Index Only Scan using idx_appointments_slot_start on practo.appointments  (cost=0.43..9850.30 rows=69226 width=0) (actual time=0.122..20.115 rows=55984.00 loops=3)
+                     Output: slot_start, appointment_id, patient_id, doctor_id, clinic_id, consult_type, status, payment_status, fee, consult_ended_at
+                     Index Cond: ((appointments.slot_start >= '2026-06-01 00:00:00+05:30'::timestamp with time zone) AND (appointments.slot_start < '2026-07-01 00:00:00+05:30'::timestamp with time zone))
+                     Heap Fetches: 54826
+                     Index Searches: 1
+                     Buffers: shared hit=49604 read=1791
+                     Worker 0:  actual time=0.046..19.192 rows=55058.00 loops=1
+                       Buffers: shared hit=15228 read=586
+                     Worker 1:  actual time=0.069..19.303 rows=53364.00 loops=1
+                       Buffers: shared hit=15180 read=569
+ Planning:
+   Buffers: shared hit=339 read=34
+ Planning Time: 4.031 ms
+ Execution Time: 24.785 ms
+(29 rows)
+
+                                                                                                 QUERY PLAN                                                                                                 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=11023.58..11023.59 rows=1 width=8) (actual time=10.943..12.060 rows=1.00 loops=1)
+   Output: count(*)
+   Buffers: shared hit=51388
+   ->  Gather  (cost=11023.36..11023.57 rows=2 width=8) (actual time=10.910..12.058 rows=3.00 loops=1)
+         Output: (PARTIAL count(*))
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=51388
+         ->  Partial Aggregate  (cost=10023.36..10023.37 rows=1 width=8) (actual time=9.554..9.554 rows=1.00 loops=3)
+               Output: PARTIAL count(*)
+               Buffers: shared hit=51388
+               Worker 0:  actual time=8.905..8.906 rows=1.00 loops=1
+                 Buffers: shared hit=14821
+               Worker 1:  actual time=8.904..8.904 rows=1.00 loops=1
+                 Buffers: shared hit=14062
+               ->  Parallel Index Only Scan using idx_appointments_slot_start on practo.appointments  (cost=0.43..9850.30 rows=69226 width=0) (actual time=0.023..8.373 rows=55984.00 loops=3)
+                     Output: slot_start, appointment_id, patient_id, doctor_id, clinic_id, consult_type, status, payment_status, fee, consult_ended_at
+                     Index Cond: ((appointments.slot_start >= '2026-06-01 00:00:00+05:30'::timestamp with time zone) AND (appointments.slot_start < '2026-07-01 00:00:00+05:30'::timestamp with time zone))
+                     Heap Fetches: 54826
+                     Index Searches: 1
+                     Buffers: shared hit=51388
+                     Worker 0:  actual time=0.033..7.763 rows=53735.00 loops=1
+                       Buffers: shared hit=14821
+                     Worker 1:  actual time=0.032..7.843 rows=49998.00 loops=1
+                       Buffers: shared hit=14062
+ Planning:
+   Buffers: shared hit=5
+ Planning Time: 0.066 ms
+ Execution Time: 12.072 ms
+(29 rows)
+
+                                                                                                 QUERY PLAN                                                                                                 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=11023.58..11023.59 rows=1 width=8) (actual time=11.794..12.867 rows=1.00 loops=1)
+   Output: count(*)
+   Buffers: shared hit=51393
+   ->  Gather  (cost=11023.36..11023.57 rows=2 width=8) (actual time=11.753..12.862 rows=3.00 loops=1)
+         Output: (PARTIAL count(*))
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=51393
+         ->  Partial Aggregate  (cost=10023.36..10023.37 rows=1 width=8) (actual time=9.875..9.875 rows=1.00 loops=3)
+               Output: PARTIAL count(*)
+               Buffers: shared hit=51393
+               Worker 0:  actual time=8.982..8.983 rows=1.00 loops=1
+                 Buffers: shared hit=14658
+               Worker 1:  actual time=8.985..8.985 rows=1.00 loops=1
+                 Buffers: shared hit=14641
+               ->  Parallel Index Only Scan using idx_appointments_slot_start on practo.appointments  (cost=0.43..9850.30 rows=69226 width=0) (actual time=0.025..8.675 rows=55984.00 loops=3)
+                     Output: slot_start, appointment_id, patient_id, doctor_id, clinic_id, consult_type, status, payment_status, fee, consult_ended_at
+                     Index Cond: ((appointments.slot_start >= '2026-06-01 00:00:00+05:30'::timestamp with time zone) AND (appointments.slot_start < '2026-07-01 00:00:00+05:30'::timestamp with time zone))
+                     Heap Fetches: 54826
+                     Index Searches: 1
+                     Buffers: shared hit=51393
+                     Worker 0:  actual time=0.031..7.844 rows=53380.00 loops=1
+                       Buffers: shared hit=14658
+                     Worker 1:  actual time=0.038..7.868 rows=51577.00 loops=1
+                       Buffers: shared hit=14641
+ Planning:
+   Buffers: shared hit=5
+ Planning Time: 0.119 ms
+ Execution Time: 12.884 ms
+(29 rows)
+
+PARTITIONED TABLE: same June 2026 count, three executions
+                                                                                                           QUERY PLAN                                                                                                           
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=5737.13..5737.14 rows=1 width=8) (actual time=18.776..19.618 rows=1.00 loops=1)
+   Output: count(*)
+   Buffers: shared read=3008
+   ->  Gather  (cost=5736.92..5737.13 rows=2 width=8) (actual time=18.771..19.614 rows=2.00 loops=1)
+         Output: (PARTIAL count(*))
+         Workers Planned: 1
+         Workers Launched: 1
+         Buffers: shared read=3008
+         ->  Partial Aggregate  (cost=4736.92..4736.93 rows=1 width=8) (actual time=17.509..17.510 rows=1.00 loops=2)
+               Output: PARTIAL count(*)
+               Buffers: shared read=3008
+               Worker 0:  actual time=16.313..16.314 rows=1.00 loops=1
+                 Buffers: shared read=1284
+               ->  Parallel Seq Scan on practo.appointments_partitioned_2026_06 appointments_partitioned  (cost=0.00..4489.93 rows=98795 width=0) (actual time=0.191..15.501 rows=83976.00 loops=2)
+                     Filter: ((appointments_partitioned.slot_start >= '2026-06-01 00:00:00+05:30'::timestamp with time zone) AND (appointments_partitioned.slot_start < '2026-07-01 00:00:00+05:30'::timestamp with time zone))
+                     Buffers: shared read=3008
+                     Worker 0:  actual time=0.256..14.557 rows=71651.00 loops=1
+                       Buffers: shared read=1284
+ Planning:
+   Buffers: shared hit=707 read=71
+ Planning Time: 7.852 ms
+ Execution Time: 19.633 ms
+(22 rows)
+
+                                                                                                           QUERY PLAN                                                                                                           
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=5737.13..5737.14 rows=1 width=8) (actual time=9.591..10.426 rows=1.00 loops=1)
+   Output: count(*)
+   Buffers: shared hit=3008
+   ->  Gather  (cost=5736.92..5737.13 rows=2 width=8) (actual time=9.547..10.424 rows=2.00 loops=1)
+         Output: (PARTIAL count(*))
+         Workers Planned: 1
+         Workers Launched: 1
+         Buffers: shared hit=3008
+         ->  Partial Aggregate  (cost=4736.92..4736.93 rows=1 width=8) (actual time=8.478..8.479 rows=1.00 loops=2)
+               Output: PARTIAL count(*)
+               Buffers: shared hit=3008
+               Worker 0:  actual time=7.470..7.470 rows=1.00 loops=1
+                 Buffers: shared hit=1191
+               ->  Parallel Seq Scan on practo.appointments_partitioned_2026_06 appointments_partitioned  (cost=0.00..4489.93 rows=98795 width=0) (actual time=0.002..6.638 rows=83976.00 loops=2)
+                     Filter: ((appointments_partitioned.slot_start >= '2026-06-01 00:00:00+05:30'::timestamp with time zone) AND (appointments_partitioned.slot_start < '2026-07-01 00:00:00+05:30'::timestamp with time zone))
+                     Buffers: shared hit=3008
+                     Worker 0:  actual time=0.002..5.979 rows=66513.00 loops=1
+                       Buffers: shared hit=1191
+ Planning:
+   Buffers: shared hit=11
+ Planning Time: 0.140 ms
+ Execution Time: 10.439 ms
+(22 rows)
+
+                                                                                                           QUERY PLAN                                                                                                           
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=5737.13..5737.14 rows=1 width=8) (actual time=8.305..9.821 rows=1.00 loops=1)
+   Output: count(*)
+   Buffers: shared hit=3008
+   ->  Gather  (cost=5736.92..5737.13 rows=2 width=8) (actual time=8.265..9.817 rows=2.00 loops=1)
+         Output: (PARTIAL count(*))
+         Workers Planned: 1
+         Workers Launched: 1
+         Buffers: shared hit=3008
+         ->  Partial Aggregate  (cost=4736.92..4736.93 rows=1 width=8) (actual time=7.281..7.282 rows=1.00 loops=2)
+               Output: PARTIAL count(*)
+               Buffers: shared hit=3008
+               Worker 0:  actual time=6.346..6.347 rows=1.00 loops=1
+                 Buffers: shared hit=1125
+               ->  Parallel Seq Scan on practo.appointments_partitioned_2026_06 appointments_partitioned  (cost=0.00..4489.93 rows=98795 width=0) (actual time=0.002..5.545 rows=83976.00 loops=2)
+                     Filter: ((appointments_partitioned.slot_start >= '2026-06-01 00:00:00+05:30'::timestamp with time zone) AND (appointments_partitioned.slot_start < '2026-07-01 00:00:00+05:30'::timestamp with time zone))
+                     Buffers: shared hit=3008
+                     Worker 0:  actual time=0.002..5.038 rows=62781.00 loops=1
+                       Buffers: shared hit=1125
+ Planning:
+   Buffers: shared hit=11
+ Planning Time: 0.145 ms
+ Execution Time: 9.833 ms
+(22 rows)
+

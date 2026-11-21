@@ -1,0 +1,32 @@
+R01  READ  avg     8.233 ms   Index Only Scan using idx_doctors_verified_experience on doctors | Index Only Scan using pk_doctor_specializations on doctor_specializations | Index Scan using specializations_pkey on specializations | Index Only Scan using idx_schedules_inclinic_doctor_weekday_start on doctor_schedules | Index Only Scan using idx_clinics_city_clinic on clinics
+R02  READ  avg     0.135 ms   Index Scan using pk_doctor_schedules on doctor_schedules | Index Scan using clinics_pkey on clinics
+R03  READ  avg     0.332 ms   Index Only Scan using idx_schedules_inclinic_doctor_weekday_start on doctor_schedules | Index Only Scan using idx_appointments_active_doctor_slot on appointments
+R04  READ  avg     0.116 ms   Index Only Scan using idx_appointments_patient_status_slot on appointments | Index Scan using doctors_pkey on doctors | Index Scan using clinics_pkey on clinics
+R05  READ  avg     0.102 ms   Index Only Scan using idx_appointments_doctor_slot on appointments | Index Scan using patients_pkey on patients
+R06  READ  avg     0.130 ms   Index Scan using patients_phone_key on patients
+R07  READ  avg     0.166 ms   Index Scan using prescriptions_appointment_id_key on prescriptions | Index Scan using pk_prescription_items on prescription_items
+R08  READ  avg   124.185 ms   Index Only Scan using idx_appointments_slot_start on appointments | Index Only Scan using idx_doctor_specializations_primary_spec_doctor on doctor_specializations | Seq Scan on specializations
+R09  READ  avg    76.855 ms   Index Scan using idx_appointments_completed_slot on appointments
+R10  READ  avg   684.276 ms   Bitmap Heap Scan on patients | Bitmap Index Scan on idx_patients_allergies_gin | Index Only Scan using idx_appointments_patient_status_slot on appointments | Index Scan using prescriptions_appointment_id_key on prescriptions | Index Scan using pk_prescription_items on prescription_items
+R11  READ  avg    65.003 ms   Bitmap Heap Scan on prescriptions | Bitmap Index Scan on idx_prescriptions_follow_up_date | Index Scan using appointments_pkey on appointments | Index Scan using idx_appointments_active_doctor_slot on appointments
+R12  READ  avg    90.526 ms   Index Only Scan using idx_appointments_slot_start on appointments
+R13  READ  avg    14.150 ms   Seq Scan on clinics | Index Only Scan using idx_schedules_clinic_id on doctor_schedules
+R14  READ  avg   505.020 ms   Seq Scan on appointments | Seq Scan on doctor_reviews
+R15  READ  avg   366.255 ms   Seq Scan on prescription_items | Seq Scan on appointments | Seq Scan on prescriptions | Index Only Scan using idx_doctor_specializations_primary_spec_doctor on doctor_specializations | Seq Scan on specializations
+R16  READ  avg    64.225 ms   Index Only Scan using idx_appointments_slot_start on appointments | Seq Scan on clinics
+R17  READ  avg   691.990 ms   Index Only Scan using idx_appointments_completed_slot on appointments | Seq Scan on patients
+R18  READ  avg    83.300 ms   Bitmap Heap Scan on doctors | Bitmap Index Scan on idx_doctors_languages_gin | Seq Scan on doctor_schedules | Index Only Scan using idx_clinics_city_clinic on clinics
+R19  READ  avg   549.582 ms   Seq Scan on doctor_schedules | Index Only Scan using idx_clinics_city_clinic on clinics | Seq Scan on doctors | Seq Scan on appointments
+R20  READ  avg    29.396 ms   Index Only Scan using idx_appointments_completed_slot on appointments
+R21  READ  avg     0.146 ms   Index Only Scan using idx_appointments_completed_pending_slot on appointments
+R22  READ  avg     8.945 ms   Index Only Scan using idx_appointments_slot_start on appointments
+R23  READ  avg     0.124 ms   Index Scan using doctors_registration_no_key on doctors
+R24  READ  avg  2851.225 ms   Seq Scan on appointments | Index Only Scan using idx_appointments_doctor_slot on appointments
+R25  READ  avg   356.415 ms   Index Only Scan using idx_appointments_completed_slot on appointments | Seq Scan on doctor_specializations
+W01  WRITE avg     2.876 ms   Index Scan using pk_doctor_schedules on doctor_schedules | Index Scan using doctors_pkey on doctors
+W02  WRITE avg     0.821 ms   Index Only Scan using idx_appointments_booked_slot on appointments | Index Scan using appointments_pkey on appointments
+W03  WRITE avg     0.209 ms   Index Scan using prescriptions_appointment_id_key on prescriptions
+W04  WRITE avg   945.381 ms   Index Scan using idx_appointments_unfinished_slot_end on appointments
+W05  WRITE avg     0.122 ms   Index Scan using idx_appointments_booked_doctor_slot on appointments
+Workload: sql/06_optimized_queries.sql
+Saved raw plans and summary to /Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/results/large

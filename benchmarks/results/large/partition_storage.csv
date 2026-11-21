@@ -1,0 +1,2 @@
+database_name,database_bytes,ordinary_table_bytes,ordinary_index_bytes,ordinary_total_bytes,partitioned_leaf_table_bytes,partitioned_leaf_index_bytes,partitioned_leaf_total_bytes
+practo_cp4_large_t0035,4409063103,441933824,1021247488,1463181312,440287232,1306935296,1747222528

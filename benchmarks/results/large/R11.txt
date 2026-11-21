@@ -1,0 +1,117 @@
+=== R11 run 1 ===
+Gather Merge  (cost=41032.74..41646.52 rows=5270 width=16) (actual time=156.812..158.785 rows=7578.00 loops=1)
+  Workers Planned: 2
+  Workers Launched: 2
+  Buffers: shared hit=61568 read=11358
+  ->  Sort  (cost=40032.71..40038.20 rows=2196 width=16) (actual time=154.280..154.337 rows=2526.00 loops=3)
+        Sort Key: p.follow_up_date
+        Sort Method: quicksort  Memory: 176kB
+        Buffers: shared hit=61568 read=11358
+        Worker 0:  Sort Method: quicksort  Memory: 177kB
+        Worker 1:  Sort Method: quicksort  Memory: 173kB
+        ->  Nested Loop Anti Join  (cost=170.33..39910.83 rows=2196 width=16) (actual time=0.926..153.958 rows=2526.00 loops=3)
+              Buffers: shared hit=61552 read=11358
+              ->  Nested Loop  (cost=169.90..36919.03 rows=3295 width=24) (actual time=0.684..16.365 rows=2526.00 loops=3)
+                    Buffers: shared hit=29066 read=2556
+                    ->  Parallel Bitmap Heap Scan on prescriptions p  (cost=169.47..14263.50 rows=3295 width=12) (actual time=0.388..1.813 rows=2526.00 loops=3)
+                          Recheck Cond: ((follow_up_date >= '2026-07-01'::date) AND (follow_up_date <= '2026-07-07'::date))
+                          Heap Blocks: exact=418
+                          Buffers: shared hit=181 read=1127
+                          Worker 0:  Heap Blocks: exact=415
+                          Worker 1:  Heap Blocks: exact=411
+                          ->  Bitmap Index Scan on idx_prescriptions_follow_up_date  (cost=0.00..167.50 rows=7907 width=0) (actual time=0.960..0.960 rows=7578.00 loops=1)
+                                Index Cond: ((follow_up_date >= '2026-07-01'::date) AND (follow_up_date <= '2026-07-07'::date))
+                                Index Searches: 1
+                                Buffers: shared read=24
+                    ->  Index Scan using appointments_pkey on appointments a  (cost=0.43..6.88 rows=1 width=20) (actual time=0.005..0.005 rows=1.00 loops=7578)
+                          Index Cond: (appointment_id = p.appointment_id)
+                          Index Searches: 7578
+                          Buffers: shared hit=28885 read=1429
+              ->  Index Scan using idx_appointments_active_doctor_slot on appointments f  (cost=0.43..0.90 rows=1 width=16) (actual time=0.054..0.054 rows=0.00 loops=7578)
+                    Index Cond: ((doctor_id = a.doctor_id) AND (slot_start > a.slot_start))
+                    Filter: (patient_id = a.patient_id)
+                    Rows Removed by Filter: 2
+                    Index Searches: 7578
+                    Buffers: shared hit=32486 read=8802
+Planning:
+  Buffers: shared hit=623 read=62
+Planning Time: 1.212 ms
+Execution Time: 158.953 ms
+=== R11 run 2 ===
+Gather Merge  (cost=41032.74..41646.52 rows=5270 width=16) (actual time=16.448..18.316 rows=7578.00 loops=1)
+  Workers Planned: 2
+  Workers Launched: 2
+  Buffers: shared hit=72919 read=7
+  ->  Sort  (cost=40032.71..40038.20 rows=2196 width=16) (actual time=14.611..14.666 rows=2526.00 loops=3)
+        Sort Key: p.follow_up_date
+        Sort Method: quicksort  Memory: 182kB
+        Buffers: shared hit=72919 read=7
+        Worker 0:  Sort Method: quicksort  Memory: 170kB
+        Worker 1:  Sort Method: quicksort  Memory: 174kB
+        ->  Nested Loop Anti Join  (cost=170.33..39910.83 rows=2196 width=16) (actual time=0.240..14.418 rows=2526.00 loops=3)
+              Buffers: shared hit=72903 read=7
+              ->  Nested Loop  (cost=169.90..36919.03 rows=3295 width=24) (actual time=0.220..4.525 rows=2526.00 loops=3)
+                    Buffers: shared hit=31615 read=7
+                    ->  Parallel Bitmap Heap Scan on prescriptions p  (cost=169.47..14263.50 rows=3295 width=12) (actual time=0.202..0.953 rows=2526.00 loops=3)
+                          Recheck Cond: ((follow_up_date >= '2026-07-01'::date) AND (follow_up_date <= '2026-07-07'::date))
+                          Heap Blocks: exact=497
+                          Buffers: shared hit=1301 read=7
+                          Worker 0:  Heap Blocks: exact=355
+                          Worker 1:  Heap Blocks: exact=392
+                          ->  Bitmap Index Scan on idx_prescriptions_follow_up_date  (cost=0.00..167.50 rows=7907 width=0) (actual time=0.339..0.339 rows=7578.00 loops=1)
+                                Index Cond: ((follow_up_date >= '2026-07-01'::date) AND (follow_up_date <= '2026-07-07'::date))
+                                Index Searches: 1
+                                Buffers: shared hit=24
+                    ->  Index Scan using appointments_pkey on appointments a  (cost=0.43..6.88 rows=1 width=20) (actual time=0.001..0.001 rows=1.00 loops=7578)
+                          Index Cond: (appointment_id = p.appointment_id)
+                          Index Searches: 7578
+                          Buffers: shared hit=30314
+              ->  Index Scan using idx_appointments_active_doctor_slot on appointments f  (cost=0.43..0.90 rows=1 width=16) (actual time=0.004..0.004 rows=0.00 loops=7578)
+                    Index Cond: ((doctor_id = a.doctor_id) AND (slot_start > a.slot_start))
+                    Filter: (patient_id = a.patient_id)
+                    Rows Removed by Filter: 2
+                    Index Searches: 7578
+                    Buffers: shared hit=41288
+Planning:
+  Buffers: shared hit=685
+Planning Time: 0.975 ms
+Execution Time: 18.484 ms
+=== R11 run 3 ===
+Gather Merge  (cost=41032.74..41646.52 rows=5270 width=16) (actual time=15.548..17.390 rows=7578.00 loops=1)
+  Workers Planned: 2
+  Workers Launched: 2
+  Buffers: shared hit=72926
+  ->  Sort  (cost=40032.71..40038.20 rows=2196 width=16) (actual time=14.141..14.198 rows=2526.00 loops=3)
+        Sort Key: p.follow_up_date
+        Sort Method: quicksort  Memory: 181kB
+        Buffers: shared hit=72926
+        Worker 0:  Sort Method: quicksort  Memory: 172kB
+        Worker 1:  Sort Method: quicksort  Memory: 173kB
+        ->  Nested Loop Anti Join  (cost=170.33..39910.83 rows=2196 width=16) (actual time=0.162..13.935 rows=2526.00 loops=3)
+              Buffers: shared hit=72910
+              ->  Nested Loop  (cost=169.90..36919.03 rows=3295 width=24) (actual time=0.146..4.269 rows=2526.00 loops=3)
+                    Buffers: shared hit=31622
+                    ->  Parallel Bitmap Heap Scan on prescriptions p  (cost=169.47..14263.50 rows=3295 width=12) (actual time=0.136..0.826 rows=2526.00 loops=3)
+                          Recheck Cond: ((follow_up_date >= '2026-07-01'::date) AND (follow_up_date <= '2026-07-07'::date))
+                          Heap Blocks: exact=499
+                          Buffers: shared hit=1308
+                          Worker 0:  Heap Blocks: exact=365
+                          Worker 1:  Heap Blocks: exact=380
+                          ->  Bitmap Index Scan on idx_prescriptions_follow_up_date  (cost=0.00..167.50 rows=7907 width=0) (actual time=0.241..0.243 rows=7578.00 loops=1)
+                                Index Cond: ((follow_up_date >= '2026-07-01'::date) AND (follow_up_date <= '2026-07-07'::date))
+                                Index Searches: 1
+                                Buffers: shared hit=24
+                    ->  Index Scan using appointments_pkey on appointments a  (cost=0.43..6.88 rows=1 width=20) (actual time=0.001..0.001 rows=1.00 loops=7578)
+                          Index Cond: (appointment_id = p.appointment_id)
+                          Index Searches: 7578
+                          Buffers: shared hit=30314
+              ->  Index Scan using idx_appointments_active_doctor_slot on appointments f  (cost=0.43..0.90 rows=1 width=16) (actual time=0.004..0.004 rows=0.00 loops=7578)
+                    Index Cond: ((doctor_id = a.doctor_id) AND (slot_start > a.slot_start))
+                    Filter: (patient_id = a.patient_id)
+                    Rows Removed by Filter: 2
+                    Index Searches: 7578
+                    Buffers: shared hit=41288
+Planning:
+  Buffers: shared hit=685
+Planning Time: 0.965 ms
+Execution Time: 17.573 ms

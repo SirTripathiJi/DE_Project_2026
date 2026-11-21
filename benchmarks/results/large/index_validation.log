@@ -1,0 +1,3 @@
+psql:benchmarks/verify_large_indexes.sql:22: NOTICE:  all 19 tuning indexes are valid and ready
+DO
+COPY 19
