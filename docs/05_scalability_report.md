@@ -11,7 +11,7 @@
 
 ## 1. Scope and reproducibility
 
-The official large archive was read from `/Users/akshattripathi/Desktop/large_data.zip`; its extracted CSVs remain outside the repository at `/Users/akshattripathi/Desktop/large_data/`. The archive passed `unzip -t`. Python's CSV parser read all 11 files, and each header matched the corresponding seed CSV. The source archive and CSVs were not copied into or committed with the project.
+The teacher's `large_data.zip` remains at `/Users/akshattripathi/Desktop/large_data.zip`. It passed ZIP integrity validation and has SHA-256 `972006a41c99725febce3c56adbe9f6c6af34e1b0e83cb4e92c1569f6306ac15`. At benchmark time, the extracted files were at `/Users/akshattripathi/Desktop/large_data/`. Each archive member was hashed and matched that CP4 source byte-for-byte. On 21 November 2026, the already-extracted tree was moved into the required project-local `large_data/` directory and revalidated there: all headers match the seed files and all CSV rows parse. This relocation does not change the benchmarked dataset. `large_data/` remains ignored by Git; neither the archive nor CSV files are committed.
 
 The run used the existing isolated PostgreSQL cluster in `.cp4_validation/pgdata`, on port 55441 and its private Unix socket. The database name was checked and found unused before creation. The schema in `sql/01_schema.sql` and all 19 indexes in `sql/05_indexes.sql` were applied. Index validation reported all 19 indexes valid and ready. `ANALYZE` ran after bulk load and after index creation. The database identity, row counts, load logs, index checks, and storage measurements are in `benchmarks/results/large/`.
 
@@ -116,7 +116,7 @@ The seed reference is `benchmarks/results/optimized/summary.csv`; it was checked
 | R21 | 0.094 | 0.146 | 1.55x |
 | R22 | 7.911 | 8.945 | 1.13x |
 | R23 | 0.084 | 0.124 | 1.48x |
-| R24 | 22.223 | 562.748 | 25.32x |
+| R24 | 17.945 | 562.748 | 31.36x |
 | R25 | 15.066 | 356.415 | 23.66x |
 | W01 | 0.834 | 2.876 | 3.45x |
 | W02 | 0.245 | 0.821 | 3.35x |
@@ -132,13 +132,13 @@ Reproduce these values from `growth_analysis.csv`. `analyze_large_results.py` de
 
 ### R24 duplicate active appointments
 
-The initial large plan for R24 used a broad sequential scan/self-join pattern and repeated index probes. The raw three-run mean was 2,851.225 ms (from `summary_before_R24_fix.csv`); the plan returned 11,308 rows and reported approximately 7,075,753 shared-buffer hits plus 1,089,633 reads. Its committed seed optimized mean was 22.223 ms, so this was a clear large-scale regression even though the analytics target was not exceeded.
+The initial large plan for R24 used a broad sequential scan/self-join pattern and repeated index probes. The raw three-run mean was 2,851.225 ms (from `summary_before_R24_fix.csv`); the plan returned 11,308 rows and reported approximately 7,075,753 shared-buffer hits plus 1,089,633 reads. The then-current CP3 version averaged 22.223 ms on seed data, making this a clear scale regression even though the analytics target was not exceeded. After the scale rewrite, the current SQL was separately measured five times on the indexed seed database: 17.945 ms average; raw plans and summary are in `benchmarks/results/optimized_r24_scale_fix_seed/`.
 
 The rewrite in `sql/06_optimized_queries.sql` first groups active appointments by `(doctor_id, slot_start)` and retains groups with duplicates, then probes matching appointment rows through the doctor/slot indexes. On the large data, the three-run remeasurement averaged 562.748 ms (454.869–772.948 ms), about **5.07x faster** than the initial large run (80.3% lower mean). The new plan uses the active-doctor-slot index to form duplicate groups once and the doctor-slot covering index for matching rows. Raw before/after plans are `R24_before_fix.txt` and `R24.txt`; the isolated rerun record is in `large_r24_after/`.
 
 `benchmark_console.log` is the initial full-workload run, before the R24 change. The final `summary.csv` and `R24.txt` use the separate three-run R24 remeasurement; the original full-run values remain available in `summary_before_R24_fix.csv` and `R24_before_fix.txt`.
 
-Result preservation was checked with `EXCEPT ALL` in both directions. The original and candidate each returned 11,308 rows, and the multiset difference was zero. The check is recorded in `R24_candidate_test.log`. The fixed query still takes 25.32x its seed mean, so this is an improvement, not evidence of scale-independent runtime.
+Result preservation was checked with `EXCEPT ALL` in both directions. The original and candidate each returned 11,308 rows, and the multiset difference was zero. The check is recorded in `R24_candidate_test.log`. Against the current seed retiming, the final large mean is 31.36× higher. The rewrite materially reduces the large-data cost but does not make runtime scale-independent.
 
 No other query exceeded its official mean target; no further index or SQL change was justified by this run. Sequential scans in R14/R15/R19 and a sequential scan of a small reference table in other plans are not by themselves defects: the broad relation/aggregate work can make a sequential scan cheaper. R10 (684.276 ms), R14 (505.020 ms), R17 (691.990 ms), R19 (549.582 ms), and W04 (945.381 ms) deserve monitoring as data grows; current evidence does not show they miss their specified mean targets.
 
@@ -195,7 +195,8 @@ After bulk load, run `ANALYZE`; for ongoing service, monitor statistics and plan
 Key artifacts under `benchmarks/results/large/`:
 
 - `summary.csv`, `R01.txt`–`R25.txt`, `W01.txt`–`W05.txt`: final 30-query measurements and raw plans.
-- `summary_before_R24_fix.csv`, `R24_before_fix.txt`, `R24.txt`, and `large_r24_after/`: R24 before/after evidence.
+- `summary_before_R24_fix.csv`, `R24_before_fix.txt`, `R24.txt`, and `large_r24_after/`: R24 large-data before/after evidence.
+- `benchmarks/results/optimized_r24_scale_fix_seed/`: five-run seed measurement of the current R24 rewrite, used for the matched growth ratio.
 - `R24_candidate_test.sql` / `.log`: result-equivalence comparison.
 - `row_counts.csv`, `load_validation.log`, `load_data.log`, `schema_apply.log`, `index_application.log`, `index_validation.log`: load, integrity, and index checks.
 - `rollback_evidence.csv`: post-benchmark write-state comparisons.

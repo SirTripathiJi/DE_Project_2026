@@ -1,0 +1,78 @@
+CP3 rewritten-query result validation
+Verified at (UTC): 2026-11-21T16:08:20.213853+00:00
+Baseline database: cp3_audit_base_20261119
+Optimized database: cp3_audit_opt_20261119
+Method: execute the reference SQL on baseline DB and optimized SQL on indexed DB; compare ordered rows, row multisets, and SHA-256 checksums.
+For R18, the reference adds doctor_id after consultation_fee; for R21/R22, it adds appointment_id after slot_start. These unique tie-breakers make the intended order deterministic. They do not alter filters, selected columns, or page bounds; for R21/R22 they define which rows belong at a LIMIT/OFFSET tie boundary.
+EXCEPT ALL counts compare those same reference and optimized SQL statements on the baseline DB.
+R13 is an intentional NULL correctness correction. All other row-set differences are reported as failures.
+
+R01: PASS same row multiset; ordered sequence identical
+  row_count: original=20 optimized=20
+  ordered_sha256: original=e54515a2e8a66f0e57ecaab4060530c59d7c1bdb3b05ffa8273faf3c646c2c05 optimized=e54515a2e8a66f0e57ecaab4060530c59d7c1bdb3b05ffa8273faf3c646c2c05
+  multiset_sha256: original=cc2cab294007fa60ccbe7747957865dd7641b838a382d1c0f69331786a4b98ab optimized=cc2cab294007fa60ccbe7747957865dd7641b838a382d1c0f69331786a4b98ab
+  EXCEPT ALL on cp3_audit_base_20261119: original_minus_optimized=0, optimized_minus_original=0
+
+R05: PASS same row multiset; ordered sequence identical
+  row_count: original=3 optimized=3
+  ordered_sha256: original=e3c65795ed06d475e2ea19d2c04914f44c937d466a5c5d4c4d3091797fc66bcb optimized=e3c65795ed06d475e2ea19d2c04914f44c937d466a5c5d4c4d3091797fc66bcb
+  multiset_sha256: original=0660b1ea81c9b0fadb938094fac7b5af5fff3104bd3a0e8ef64504dece660450 optimized=0660b1ea81c9b0fadb938094fac7b5af5fff3104bd3a0e8ef64504dece660450
+  EXCEPT ALL on cp3_audit_base_20261119: original_minus_optimized=0, optimized_minus_original=0
+
+R08: PASS same row multiset; ordered sequence identical
+  row_count: original=15 optimized=15
+  ordered_sha256: original=91be08869a60d8e0f2f2aa70f6b147105d876920c59625d24126e956ca95293e optimized=91be08869a60d8e0f2f2aa70f6b147105d876920c59625d24126e956ca95293e
+  multiset_sha256: original=498d17ea20acfad8921edfcfccc2148882757fb455ade5ae6a17f54e74ac8373 optimized=498d17ea20acfad8921edfcfccc2148882757fb455ade5ae6a17f54e74ac8373
+  EXCEPT ALL on cp3_audit_base_20261119: original_minus_optimized=0, optimized_minus_original=0
+
+R12: PASS same row multiset; ordered sequence identical
+  row_count: original=14 optimized=14
+  ordered_sha256: original=9831295cae671f9eeacd529181cb6cb023c3ca69910db58e14b2fecdce7d6156 optimized=9831295cae671f9eeacd529181cb6cb023c3ca69910db58e14b2fecdce7d6156
+  multiset_sha256: original=9831295cae671f9eeacd529181cb6cb023c3ca69910db58e14b2fecdce7d6156 optimized=9831295cae671f9eeacd529181cb6cb023c3ca69910db58e14b2fecdce7d6156
+  EXCEPT ALL on cp3_audit_base_20261119: original_minus_optimized=0, optimized_minus_original=0
+
+R13: PASS intentional NULL correction
+  row_count: original=0 optimized=292
+  ordered_sha256: original=4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945 optimized=0850b06ea5ad21190a62e3da5ccbb5c79c85e2c4eeb57c21d66850a00efb424c
+  multiset_sha256: original=4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945 optimized=60b42f455c3a0a1d85f1bec09e78a2f8669496fd3cc179200608cb4bd1ecce30
+  EXCEPT ALL on cp3_audit_base_20261119: original_minus_optimized=0, optimized_minus_original=292
+  optimized_only_sample: [('15', 'Family Care Clinic Mumbai 15', '2'), ('19', 'Fortis Clinic Delhi 19', '3'), ('40', 'Apollo Clinic Mumbai 40', '2')]
+
+R18: PASS same row multiset; ordered sequence identical
+  row_count: original=360 optimized=360
+  ordered_sha256: original=713981749e10bb74340ce198b576c511dc8ad539c487de4913582351f6fc7834 optimized=713981749e10bb74340ce198b576c511dc8ad539c487de4913582351f6fc7834
+  multiset_sha256: original=0c09a9bb394464f784284b3f1d2e53dee5b8fd2dc69cc9a84300c1793c23d5e8 optimized=0c09a9bb394464f784284b3f1d2e53dee5b8fd2dc69cc9a84300c1793c23d5e8
+  EXCEPT ALL on cp3_audit_base_20261119: original_minus_optimized=0, optimized_minus_original=0
+
+R19: PASS same row multiset; ordered sequence identical
+  row_count: original=480 optimized=480
+  ordered_sha256: original=515633605b2bab8dc2c91e2310070fd97cdd702f30d48f0b82d74b45e54eb937 optimized=515633605b2bab8dc2c91e2310070fd97cdd702f30d48f0b82d74b45e54eb937
+  multiset_sha256: original=ab671a200259e38e43d132c1d5375041c4061cc7ac93fd52d9b7f698d1bfbf85 optimized=ab671a200259e38e43d132c1d5375041c4061cc7ac93fd52d9b7f698d1bfbf85
+  EXCEPT ALL on cp3_audit_base_20261119: original_minus_optimized=0, optimized_minus_original=0
+
+R20: PASS same row multiset; ordered sequence identical
+  row_count: original=26 optimized=26
+  ordered_sha256: original=3c8d51ee56f2aec4d35ee575d5b7df62ab7d16fb114b23bff2502d50ec382e0c optimized=3c8d51ee56f2aec4d35ee575d5b7df62ab7d16fb114b23bff2502d50ec382e0c
+  multiset_sha256: original=3c8d51ee56f2aec4d35ee575d5b7df62ab7d16fb114b23bff2502d50ec382e0c optimized=3c8d51ee56f2aec4d35ee575d5b7df62ab7d16fb114b23bff2502d50ec382e0c
+  EXCEPT ALL on cp3_audit_base_20261119: original_minus_optimized=0, optimized_minus_original=0
+
+R21: PASS same row multiset; ordered sequence identical
+  row_count: original=100 optimized=100
+  ordered_sha256: original=a5b95586cf5d6ba1e4a76b700c3ac6c437ea4c89b09bdb6d5611b53c8e662fcc optimized=a5b95586cf5d6ba1e4a76b700c3ac6c437ea4c89b09bdb6d5611b53c8e662fcc
+  multiset_sha256: original=9bffe6c753f6f1d4fb02a8ec045eb52e8cd18892810198e360008a5840ff43df optimized=9bffe6c753f6f1d4fb02a8ec045eb52e8cd18892810198e360008a5840ff43df
+  EXCEPT ALL on cp3_audit_base_20261119: original_minus_optimized=0, optimized_minus_original=0
+
+R22: PASS same row multiset; ordered sequence identical
+  row_count: original=25 optimized=25
+  ordered_sha256: original=0327f5c1e41e150ae9c59295e7598ff4ee5ca6ebf1ac076aa3afa440b7b00c28 optimized=0327f5c1e41e150ae9c59295e7598ff4ee5ca6ebf1ac076aa3afa440b7b00c28
+  multiset_sha256: original=9acc1abc28740087f8cc7569c3f3a9ec0cf5750c1a69879b5ab3297a959d6889 optimized=9acc1abc28740087f8cc7569c3f3a9ec0cf5750c1a69879b5ab3297a959d6889
+  EXCEPT ALL on cp3_audit_base_20261119: original_minus_optimized=0, optimized_minus_original=0
+
+R24: PASS same row multiset; only row order differs
+  row_count: original=559 optimized=559
+  ordered_sha256: original=f5eb1f6a65f011fa41ba68de0f54d6ab7d6991366a2d4e0346ab6d562c5c49c8 optimized=88548ba0cb3737426d0f2307eb24d9f74ed313cd22ae643df2c776d4c904226b
+  multiset_sha256: original=7c939c422219f5b92e07893b2854c97c82d13510b46ed96dc2782b88b09e5469 optimized=7c939c422219f5b92e07893b2854c97c82d13510b46ed96dc2782b88b09e5469
+  EXCEPT ALL on cp3_audit_base_20261119: original_minus_optimized=0, optimized_minus_original=0
+
+Changed read queries checked: 11
+Strict result-preservation failures (excluding the intended R13 correction): none

@@ -1,0 +1,2 @@
+query_id,type,avg_ms,median_ms,min_ms,max_ms,scan_nodes
+R24,READ,17.945,17.506,17.062,20.282,Index Only Scan using idx_appointments_active_doctor_slot on appointments | Index Only Scan using idx_appointments_doctor_slot on appointments

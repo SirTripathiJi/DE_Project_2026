@@ -2,7 +2,7 @@
 
 ## Executive summary
 
-The optimized workload substantially reduced elapsed time for selective lookups, date-window searches, and the R19 city report. Using the average execution times in the saved summaries, 27 of 30 queries were faster, 3 were slower, and 0 were unchanged at the recorded precision. R19 improved from 4,852.527 ms to 24.267 ms (199.96×), the largest gain.
+The optimized workload substantially reduced elapsed time for selective lookups, date-window searches, and the R19 city report. Using the average execution times in the saved summaries, 27 of 30 queries were faster, 3 were slower, and 0 were unchanged at the recorded precision. R19 improved from 4,852.527 ms to 24.267 ms (199.96×), the largest gain. After the CP4 scale investigation, R24 was rewritten and remeasured on the seed database; the current five-run mean is 17.945 ms and its current large-data mean is recorded separately in the scalability report.
 
 R13 is a correctness correction as well as a query rewrite. Its original `NOT IN` returns no rows when the subquery contains NULL clinic IDs; the optimized `NOT EXISTS` returns the 292 clinics without schedules. Its timing difference is therefore not a strictly like-for-like result comparison.
 
@@ -12,19 +12,19 @@ The baseline summary contains three executions per query; the optimized summary 
 
 | Query | Baseline avg (ms) | Optimized avg (ms) | Speedup / slowdown | Technique or explanation |
 |---|---:|---:|---:|---|
-| R01 | 1.661 | 1.597 | 1.04×; 3.8% faster | Replaced multiplicative joins and `DISTINCT` with specialization and clinic `EXISTS` checks; verified-doctor, specialization, and city indexes appear in the plan. |
-| R02 | 0.194 | 0.433 | 0.45×; 123.4% slower | No rewrite; the schedule primary key serves the doctor lookup. Clinic lookup remains a small sequential scan. |
-| R03 | 8.711 | 0.091 | 95.94×; 99.0% faster | Uses the partial in-clinic schedule index and active doctor/slot index for the availability anti-lookup. |
-| R04 | 6.734 | 0.086 | 77.94×; 98.7% faster | Uses the patient/status/slot covering index to find the patient’s booked appointments. |
-| R05 | 5.312 | 0.105 | 50.79×; 98.0% faster | Replaced `DATE(slot_start)` with a half-open timestamp range; the doctor/slot index serves the lookup and ordering. |
-| R06 | 0.028 | 0.022 | 1.24×; 19.0% faster | No rewrite; existing unique phone index serves the exact lookup. |
-| R07 | 0.112 | 0.045 | 2.50×; 60.0% faster | No rewrite; prescription appointment uniqueness and the prescription-item primary key serve the joins. |
+| R01 | 1.661 | 1.597 | 1.04×; 3.9% faster | Replaced multiplicative joins and `DISTINCT` with specialization and clinic `EXISTS` checks; verified-doctor, specialization, and city indexes appear in the plan. |
+| R02 | 0.194 | 0.433 | 0.45×; 123.2% slower | No rewrite; the schedule primary key serves the doctor lookup. Clinic lookup remains a small sequential scan. |
+| R03 | 8.711 | 0.091 | 95.73×; 99.0% faster | Uses the partial in-clinic schedule index and active doctor/slot index for the availability anti-lookup. |
+| R04 | 6.734 | 0.086 | 78.30×; 98.7% faster | Uses the patient/status/slot covering index to find the patient’s booked appointments. |
+| R05 | 5.312 | 0.105 | 50.59×; 98.0% faster | Replaced `DATE(slot_start)` with a half-open timestamp range; the doctor/slot index serves the lookup and ordering. |
+| R06 | 0.028 | 0.022 | 1.27×; 21.4% faster | No rewrite; existing unique phone index serves the exact lookup. |
+| R07 | 0.112 | 0.045 | 2.49×; 59.8% faster | No rewrite; prescription appointment uniqueness and the prescription-item primary key serve the joins. |
 | R08 | 18.087 | 12.476 | 1.45×; 31.0% faster | Uses a half-open 2026 timestamp range instead of extracting the year; the plan reads the slot-start index. |
 | R09 | 8.223 | 2.472 | 3.33×; 69.9% faster | No rewrite; the completed-appointment partial slot index serves the June window. |
 | R10 | 19.251 | 19.964 | 0.96×; 3.7% slower | No rewrite; the allergy containment predicate uses the patients’ GIN index. The remaining joins still touch appointments, prescriptions, and prescription items. |
 | R11 | 17.712 | 1.640 | 10.80×; 90.7% faster | No rewrite; uses the follow-up-date index and an indexed active-appointment anti-lookup. |
 | R12 | 26.287 | 9.751 | 2.70×; 62.9% faster | Replaced year extraction with a half-open timestamp range; the slot-start index supports the bounded scan. |
-| R13 | 2.704 | 0.590 | 4.59×; 78.2% faster | Replaced NULL-sensitive `NOT IN` with `NOT EXISTS`; the clinic-ID schedule index supports the existence check. |
+| R13 | 2.704 | 0.590 | 4.58×; 78.2% faster | Replaced NULL-sensitive `NOT IN` with `NOT EXISTS`; the clinic-ID schedule index supports the existence check. |
 | R14 | 20.355 | 19.084 | 1.07×; 6.2% faster | No rewrite; ranking aggregates the review population, so both plans scan appointments and reviews. |
 | R15 | 22.688 | 21.484 | 1.06×; 5.3% faster | No rewrite; the broad prescription-to-appointment-specialization aggregation still uses sequential scans. |
 | R16 | 9.670 | 1.779 | 5.44×; 81.6% faster | No rewrite; the June timestamp range uses the slot-start index before clinic aggregation. |
@@ -32,16 +32,16 @@ The baseline summary contains three executions per query; the optimized summary 
 | R18 | 4.312 | 2.659 | 1.62×; 38.3% faster | Replaced `= ANY(array)` with GIN-supported array containment and schedule/clinic joins with `EXISTS`. |
 | R19 | 4,852.527 | 24.267 | 199.96×; 99.5% faster | Aggregates appointment statistics once by doctor and left-joins them, rather than running two correlated appointment scans per doctor. |
 | R20 | 7.982 | 1.066 | 7.49×; 86.6% faster | Replaced the cast-to-date filter with a half-open timestamp range; uses the completed-slot partial index. |
-| R21 | 8.306 | 0.094 | 88.37×; 98.9% faster | No rewrite; the completed-and-pending partial covering index supplies the newest 100 rows. |
+| R21 | 8.306 | 0.094 | 88.36×; 98.9% faster | No rewrite; the completed-and-pending partial covering index supplies the newest 100 rows. |
 | R22 | 33.728 | 7.911 | 4.26×; 76.5% faster | Preserved `OFFSET 100000 LIMIT 25`; the slot-start index supplies descending order without a full sort. The large offset remains. |
-| R23 | 0.185 | 0.084 | 2.19×; 54.4% faster | No rewrite; the existing unique registration-number index serves the lookup. |
-| R24 | 32.143 | 22.223 | 1.45×; 30.9% faster | No rewrite; the broad self-join still uses a sequential scan to find duplicate active slots. |
+| R23 | 0.185 | 0.084 | 2.20×; 54.6% faster | No rewrite; the existing unique registration-number index serves the lookup. |
+| R24 | 32.143 | 17.945 | 1.79×; 44.2% faster | Scale-driven rewrite groups duplicate active `(doctor_id, slot_start)` values once, then joins through the active doctor/slot indexes; current seed timing is five runs, recorded in `benchmarks/results/optimized_r24_scale_fix_seed/`. |
 | R25 | 19.776 | 15.066 | 1.31×; 23.8% faster | No rewrite; uses the completed-slot partial index with the primary-specialization association. |
 | W01 | 0.723 | 0.834 | 0.87×; 15.4% slower | SQL unchanged; schedule and doctor primary keys serve the insert-select. The insert also maintains the appointment indexes. |
-| W02 | 7.043 | 0.245 | 28.80×; 96.5% faster | SQL unchanged; the booked-slot partial index finds the earliest eligible appointment, then the appointment primary key updates it. |
+| W02 | 7.043 | 0.245 | 28.75×; 96.5% faster | SQL unchanged; the booked-slot partial index finds the earliest eligible appointment, then the appointment primary key updates it. |
 | W03 | 0.301 | 0.154 | 1.95×; 48.8% faster | SQL unchanged; prescription appointment uniqueness serves the update lookup. The follow-up-date index may add maintenance work. |
 | W04 | 9.141 | 6.499 | 1.41×; 28.9% faster | SQL unchanged; the partial unfinished-slot-end index finds eligible rows. |
-| W05 | 6.878 | 0.245 | 28.03×; 96.4% faster | SQL unchanged; the booked-doctor/slot partial index finds the affected appointments. |
+| W05 | 6.878 | 0.245 | 28.07×; 96.4% faster | SQL unchanged; the booked-doctor/slot partial index finds the affected appointments. |
 
 \* R13’s output intentionally changes: baseline returns 0 rows; optimized returns 292. The timing ratio describes measured elapsed time, not equivalent-result performance.
 
@@ -61,11 +61,11 @@ Average times below come from the summary CSVs. The plan details and buffer coun
 
 ## Result-equivalence validation
 
-On 19 November 2026, the original and optimized SQL for every changed read query was executed against a fresh PostgreSQL 18.7 validation database loaded from the official seed CSVs and indexed with `sql/05_indexes.sql`. Results were compared as row multisets. The reproducible checker is `benchmarks/validate_equivalence.py`; its captured output is [equivalence_check.txt](../benchmarks/results/optimized/equivalence_check.txt).
+On 21 November 2026, the original and current optimized SQL for every changed read query was executed against the existing PostgreSQL 18.7 seed validation databases (`cp3_audit_base_20261119` and `cp3_audit_opt_20261119`). The checker compares ordered rows, row multisets, SHA-256 digests and `EXCEPT ALL` in both directions. Its reproducible implementation is `benchmarks/validate_equivalence.py`; the latest captured output is [equivalence_check_20261121.txt](../benchmarks/results/optimized/equivalence_check_20261121.txt). The earlier captures are retained as historical evidence.
 
-R01, R05, R08, R12, R19 and R20 produced identical ordered rows. R18 returned the same 360-row multiset; row order differed among doctors tied on experience because the query does not specify a unique tie-breaker. R13 intentionally changed from 0 rows to 292 unscheduled clinics due to the NULL-correctness fix described below. These are seed-data checks; large-data equivalence remains untested until faculty provides that dataset.
+R01, R05, R08, R12, R19 and R20 produced identical ordered rows. R18 returned the same 360-row multiset and the same order after adding a stable doctor-ID tie-breaker. The current R24 rewrite returned the same 559-row multiset; row order can differ because its `ORDER BY slot_start` does not define order among equal timestamps. R13 intentionally changed from 0 rows to 292 unscheduled clinics due to the NULL-correctness fix described below. Seed result validation does not by itself prove equivalence on every possible future database state.
 
-The literal workload comparisons for R21 and R22 in `equivalence_check.txt` and `equivalence_check_final.txt` show different rows at their LIMIT/OFFSET boundaries: the first capture differs by two rows for each query, and the final capture differs by one row for R21 and two for R22. Their prescribed `ORDER BY slot_start DESC` keys are not unique, so SQL does not guarantee which tied rows appear at those boundaries. The optimized queries add `appointment_id ASC` as a secondary sort. `equivalence_check_deterministic.txt` applies that same secondary sort to the reference queries and reports identical ordered rows and multisets. This validates the deterministic ordering variant; it does not establish identical boundary membership against the literal workload for every dataset. The faculty workload itself remains unchanged.
+The literal workload comparisons for R21 and R22 in the earlier captures show different rows at their LIMIT/OFFSET boundaries because `slot_start` is not unique. The current checker adds `appointment_id ASC` to the reference execution, matching the stable ordering in the optimized SQL; the latest run reports identical ordered rows and multisets for both queries. This proves equivalence under deterministic tie ordering, not identical boundary membership against the literal, non-unique ordering. The faculty workload itself remains unchanged.
 
 ## R13 NULL correctness
 
@@ -73,7 +73,17 @@ The original R13 condition was `clinic_id NOT IN (SELECT clinic_id FROM doctor_s
 
 ## Write-query performance and index maintenance
 
-The sum of the five write-query average timings is 24.086 ms for baseline and 7.977 ms for optimized; that is 3.02× lower measured elapsed time across one representative execution of each write query. W02, W04, and W05 improved with indexes that narrow the candidate rows. W01 was slower by 0.111 ms, while W03 was faster by 0.147 ms. The added indexes require maintenance on writes, which can contribute to overhead; for these short queries, the measured differences are also small enough that run-to-run variance matters. The benchmark rolls each write back, so these runs do not persist their data changes.
+The baseline and optimized averages show the net change for the five write statements, all measured with rollback. The table reports the observed difference; it does not isolate index-maintenance cost from run-to-run and database-state effects.
+
+| Query | Baseline mean (ms) | Optimized mean (ms) | Change (ms) | Observed result |
+|---|---:|---:|---:|---|
+| W01 | 0.723 | 0.834 | +0.111 | Slower by 15.4%; small absolute increase, attribution to index maintenance is not isolated. |
+| W02 | 7.043 | 0.245 | −6.798 | Faster; the booked-slot partial index narrows candidate selection. |
+| W03 | 0.301 | 0.154 | −0.147 | Faster in these runs; added index maintenance did not outweigh the indexed lookup. |
+| W04 | 9.141 | 6.499 | −2.642 | Faster; the unfinished-slot partial index narrows the update set. |
+| W05 | 6.878 | 0.245 | −6.633 | Faster; the booked-doctor/slot partial index narrows candidate selection. |
+
+The summed averages are 24.086 ms baseline and 7.977 ms optimized, a 3.02× lower total for one execution of each statement. This is a workload before/after comparison, not a controlled estimate of index-only write cost. The full three-run/five-run source measurements remain in the raw plan files and summaries; each write is wrapped in `BEGIN`/`ROLLBACK`.
 
 ## Index storage compared with table storage
 
@@ -99,13 +109,40 @@ Largest measured indexes in the same fresh database:
 | `idx_prescription_items_medicine_trgm` | prescription_items | 7,135,232 | 6.80 |
 | `pk_prescription_items` | prescription_items | 5,488,640 | 5.23 |
 
+### Size of every Phase 4 workload index
+
+The following read-only `pg_relation_size` measurements were taken on 21 November 2026 from `cp3_audit_opt_20261119` (PostgreSQL 18.7). `table_bytes` uses `pg_table_size`. This table covers each of the 19 workload indexes created by `sql/05_indexes.sql`; primary-key and other schema indexes are not included. The raw CSV records database, version, timestamp and exact byte counts.
+
+| Table | Index | Index size (bytes) | Table size (bytes) | Index / table |
+|---|---|---:|---:|---:|
+| appointments | `idx_appointments_active_doctor_slot` | 4,276,224 | 23,060,480 | 18.544% |
+| appointments | `idx_appointments_booked_doctor_slot` | 114,688 | 23,060,480 | 0.497% |
+| appointments | `idx_appointments_booked_slot` | 139,264 | 23,060,480 | 0.604% |
+| appointments | `idx_appointments_completed_pending_slot` | 1,236,992 | 23,060,480 | 5.364% |
+| appointments | `idx_appointments_completed_slot` | 7,168,000 | 23,060,480 | 31.083% |
+| appointments | `idx_appointments_doctor_slot` | 13,443,072 | 23,060,480 | 58.295% |
+| appointments | `idx_appointments_noshow_slot` | 491,520 | 23,060,480 | 2.131% |
+| appointments | `idx_appointments_patient_status_slot` | 12,566,528 | 23,060,480 | 54.494% |
+| appointments | `idx_appointments_slot_start` | 13,344,768 | 23,060,480 | 57.869% |
+| appointments | `idx_appointments_unfinished_slot_end` | 98,304 | 23,060,480 | 0.426% |
+| clinics | `idx_clinics_city_clinic` | 57,344 | 204,800 | 28.000% |
+| doctor_schedules | `idx_schedules_clinic_id` | 212,992 | 1,875,968 | 11.354% |
+| doctor_schedules | `idx_schedules_inclinic_doctor_weekday_start` | 1,236,992 | 1,875,968 | 65.939% |
+| doctor_specializations | `idx_doctor_specializations_primary_spec_doctor` | 90,112 | 196,608 | 45.833% |
+| doctors | `idx_doctors_languages_gin` | 24,576 | 458,752 | 5.357% |
+| doctors | `idx_doctors_verified_experience` | 155,648 | 458,752 | 33.929% |
+| patients | `idx_patients_allergies_gin` | 81,920 | 4,587,520 | 1.786% |
+| prescription_items | `idx_prescription_items_medicine_trgm` | 7,135,232 | 18,522,112 | 38.523% |
+| prescriptions | `idx_prescriptions_follow_up_date` | 671,744 | 7,512,064 | 8.942% |
+
+Raw measurement: [index_storage_detailed.csv](../benchmarks/results/optimized/index_storage_detailed.csv), produced by [measure_index_storage.sql](../benchmarks/measure_index_storage.sql).
+
 ## Queries with little or no improvement
 
-- **R01 and R02** were slower by 0.7% and 4.0%, respectively, at low absolute runtimes. Their plans use relevant indexes, so the differences are small relative to sub-3-ms execution and should not be treated as a material regression from these runs alone.
-- **R24** was slower by 2.9%. It still requires comparing active appointment pairs and returned 559 rows; the measured plan uses a sequential scan of appointments. The current query/index arrangement does not avoid the broad pair search.
-- **W01 and W03** were slower by 27.0% and 10.8%. They are short writes, and additional index maintenance is a possible contributor; these measurements do not isolate that cost from timing variation.
-- **R23** was unchanged at the CSV’s three-decimal precision because the registration-number unique index already served the baseline query.
-- **R14 and R15** improved only 2.0% and 1.4%. Both aggregate broadly across reviews or prescription items and their related rows, so the query-specific indexes do not remove most of the work.
+- **R01** was 3.9% faster. **R02** was 123.2% slower in relative terms but only 0.239 ms slower in absolute terms (0.194 to 0.433 ms). Its plan still uses the schedule primary key; the low absolute runtime makes repeated measurements important before treating this as a material service regression.
+- **R24**'s original CP3 query was a broad active-appointment self-join. The scale-driven grouped rewrite now returns the same seed row multiset and averages 17.945 ms on seed data; its large-data before/after evidence is discussed in the Phase 5 report.
+- **W01** was 0.111 ms slower (15.4%) in these runs. It is a short write; the evidence does not isolate index-maintenance cost from timing variation.
+- **R14 and R15** improved 6.2% and 5.3%. Both aggregate broadly across reviews or prescription items and their related rows, so the query-specific indexes do not remove most of the work.
 
 Other moderate improvements also leave substantial work in place: R10 still joins several large relations after the allergy GIN lookup; R17 still joins and groups many completed appointments; and R22 still advances through the 100,000 rows required by its specified offset.
 
@@ -113,14 +150,15 @@ Other moderate improvements also leave substantial work in place: R10 still join
 
 The most effective changes combined selective predicates with indexes already defined for their access paths. The R19 aggregation rewrite removed repeated full-table work, while R03–R05 and R21 replaced broad appointment scans with indexed lookups. Date-range predicates in R05, R08, R12, and R20 allow B-tree range scans without changing their date-window semantics.
 
-The workload’s measured improvements come with index storage of 74.28 MiB, compared with 55.38 MiB of table storage on the fresh validation database. Some low-cost queries remained flat or slightly slower, and R24 remains a broad self-join. R22 retains the prescribed page size and offset, with an added `appointment_id ASC` tie-breaker; rows selected at a timestamp tie boundary can therefore differ from one execution of the literal workload. The original workload has no unique tie-breaker for R18, R21 or R22; the optimized SQL adds `doctor_id` for R18 and `appointment_id` for R21/R22. R13’s output is intentionally corrected for NULL behavior.
+The workload’s measured improvements come with index storage of 74.28 MiB, compared with 55.38 MiB of table storage in the stated seed measurement. Some low-cost queries remain flat or slower. R22 retains the prescribed page size and offset, with a stable `appointment_id ASC` tie-breaker; the selected rows at a timestamp tie boundary are not guaranteed to match the literal workload's unspecified order. R13's output is intentionally corrected for NULL behavior. R24's later scale rewrite is included in the current optimized SQL and has separate seed and large-data measurements.
 
 ## Measurement sources and artifacts
 
 - [Baseline summary](../benchmarks/results/baseline/summary.csv) and [optimized summary](../benchmarks/results/optimized/summary.csv)
-- [Seed result-equivalence check](../benchmarks/results/optimized/equivalence_check.txt) and [reusable checker](../benchmarks/validate_equivalence.py)
+- [Latest seed result-equivalence check](../benchmarks/results/optimized/equivalence_check_20261121.txt) and [reusable checker](../benchmarks/validate_equivalence.py)
 - Raw plans: `benchmarks/results/baseline/{R01–R25,W01–W05}.txt` and `benchmarks/results/optimized/{R01–R25,W01–W05}.txt`
 - Index definitions: [sql/05_indexes.sql](../sql/05_indexes.sql)
+- Per-index size evidence: [index_storage_detailed.csv](../benchmarks/results/optimized/index_storage_detailed.csv)
 - Optimized workload: [sql/06_optimized_queries.sql](../sql/06_optimized_queries.sql)
 
 Baseline raw plans contain three runs per query; optimized raw plans contain five. No measurements or missing query timings were filled in or estimated.

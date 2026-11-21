@@ -1,0 +1,200 @@
+=== R24 run 1 ===
+Sort  (cost=15549.22..15549.22 rows=1 width=20) (actual time=20.229..20.240 rows=559.00 loops=1)
+  Sort Key: a.slot_start DESC
+  Sort Method: quicksort  Memory: 46kB
+  Buffers: shared hit=23500
+  CTE duplicate_slots
+    ->  GroupAggregate  (cost=0.42..5909.05 rows=5452 width=12) (actual time=0.042..18.324 rows=549.00 loops=1)
+          Group Key: appointments.doctor_id, appointments.slot_start
+          Filter: (count(*) > 1)
+          Rows Removed by Filter: 133997
+          Buffers: shared hit=18254
+          ->  Index Only Scan using idx_appointments_active_doctor_slot on appointments  (cost=0.42..4657.07 rows=139668 width=12) (actual time=0.006..9.281 rows=135100.00 loops=1)
+                Heap Fetches: 17881
+                Index Searches: 1
+                Buffers: shared hit=18254
+  ->  Nested Loop  (cost=0.84..9640.16 rows=1 width=20) (actual time=0.055..20.173 rows=559.00 loops=1)
+        Buffers: shared hit=23497
+        ->  Nested Loop  (cost=0.42..9632.07 rows=16 width=28) (actual time=0.050..19.428 rows=1103.00 loops=1)
+              Buffers: shared hit=19997
+              ->  CTE Scan on duplicate_slots d  (cost=0.00..109.04 rows=5452 width=12) (actual time=0.043..18.373 rows=549.00 loops=1)
+                    Storage: Memory  Maximum Storage: 38kB
+                    Buffers: shared hit=18254
+              ->  Index Only Scan using idx_appointments_doctor_slot on appointments a  (cost=0.42..1.74 rows=1 width=16) (actual time=0.002..0.002 rows=2.01 loops=549)
+                    Index Cond: ((doctor_id = d.doctor_id) AND (slot_start = d.slot_start))
+                    Filter: ((status)::text <> 'CANCELLED'::text)
+                    Rows Removed by Filter: 0
+                    Heap Fetches: 92
+                    Index Searches: 549
+                    Buffers: shared hit=1743
+        ->  Index Only Scan using idx_appointments_doctor_slot on appointments b  (cost=0.42..0.50 rows=1 width=16) (actual time=0.001..0.001 rows=0.51 loops=1103)
+              Index Cond: ((doctor_id = a.doctor_id) AND (slot_start = a.slot_start))
+              Filter: (((status)::text <> 'CANCELLED'::text) AND (appointment_id > a.appointment_id))
+              Rows Removed by Filter: 2
+              Heap Fetches: 184
+              Index Searches: 1103
+              Buffers: shared hit=3500
+Planning:
+  Buffers: shared hit=473
+Planning Time: 0.987 ms
+Execution Time: 20.282 ms
+=== R24 run 2 ===
+Sort  (cost=15549.22..15549.22 rows=1 width=20) (actual time=17.499..17.508 rows=559.00 loops=1)
+  Sort Key: a.slot_start DESC
+  Sort Method: quicksort  Memory: 46kB
+  Buffers: shared hit=23500
+  CTE duplicate_slots
+    ->  GroupAggregate  (cost=0.42..5909.05 rows=5452 width=12) (actual time=0.036..15.840 rows=549.00 loops=1)
+          Group Key: appointments.doctor_id, appointments.slot_start
+          Filter: (count(*) > 1)
+          Rows Removed by Filter: 133997
+          Buffers: shared hit=18254
+          ->  Index Only Scan using idx_appointments_active_doctor_slot on appointments  (cost=0.42..4657.07 rows=139668 width=12) (actual time=0.005..7.642 rows=135100.00 loops=1)
+                Heap Fetches: 17881
+                Index Searches: 1
+                Buffers: shared hit=18254
+  ->  Nested Loop  (cost=0.84..9640.16 rows=1 width=20) (actual time=0.047..17.453 rows=559.00 loops=1)
+        Buffers: shared hit=23497
+        ->  Nested Loop  (cost=0.42..9632.07 rows=16 width=28) (actual time=0.043..16.784 rows=1103.00 loops=1)
+              Buffers: shared hit=19997
+              ->  CTE Scan on duplicate_slots d  (cost=0.00..109.04 rows=5452 width=12) (actual time=0.036..15.883 rows=549.00 loops=1)
+                    Storage: Memory  Maximum Storage: 38kB
+                    Buffers: shared hit=18254
+              ->  Index Only Scan using idx_appointments_doctor_slot on appointments a  (cost=0.42..1.74 rows=1 width=16) (actual time=0.001..0.001 rows=2.01 loops=549)
+                    Index Cond: ((doctor_id = d.doctor_id) AND (slot_start = d.slot_start))
+                    Filter: ((status)::text <> 'CANCELLED'::text)
+                    Rows Removed by Filter: 0
+                    Heap Fetches: 92
+                    Index Searches: 549
+                    Buffers: shared hit=1743
+        ->  Index Only Scan using idx_appointments_doctor_slot on appointments b  (cost=0.42..0.50 rows=1 width=16) (actual time=0.001..0.001 rows=0.51 loops=1103)
+              Index Cond: ((doctor_id = a.doctor_id) AND (slot_start = a.slot_start))
+              Filter: (((status)::text <> 'CANCELLED'::text) AND (appointment_id > a.appointment_id))
+              Rows Removed by Filter: 2
+              Heap Fetches: 184
+              Index Searches: 1103
+              Buffers: shared hit=3500
+Planning:
+  Buffers: shared hit=473
+Planning Time: 0.756 ms
+Execution Time: 17.544 ms
+=== R24 run 3 ===
+Sort  (cost=15549.22..15549.22 rows=1 width=20) (actual time=17.285..17.296 rows=559.00 loops=1)
+  Sort Key: a.slot_start DESC
+  Sort Method: quicksort  Memory: 46kB
+  Buffers: shared hit=23500
+  CTE duplicate_slots
+    ->  GroupAggregate  (cost=0.42..5909.05 rows=5452 width=12) (actual time=0.033..15.649 rows=549.00 loops=1)
+          Group Key: appointments.doctor_id, appointments.slot_start
+          Filter: (count(*) > 1)
+          Rows Removed by Filter: 133997
+          Buffers: shared hit=18254
+          ->  Index Only Scan using idx_appointments_active_doctor_slot on appointments  (cost=0.42..4657.07 rows=139668 width=12) (actual time=0.004..7.403 rows=135100.00 loops=1)
+                Heap Fetches: 17881
+                Index Searches: 1
+                Buffers: shared hit=18254
+  ->  Nested Loop  (cost=0.84..9640.16 rows=1 width=20) (actual time=0.049..17.236 rows=559.00 loops=1)
+        Buffers: shared hit=23497
+        ->  Nested Loop  (cost=0.42..9632.07 rows=16 width=28) (actual time=0.045..16.552 rows=1103.00 loops=1)
+              Buffers: shared hit=19997
+              ->  CTE Scan on duplicate_slots d  (cost=0.00..109.04 rows=5452 width=12) (actual time=0.033..15.689 rows=549.00 loops=1)
+                    Storage: Memory  Maximum Storage: 38kB
+                    Buffers: shared hit=18254
+              ->  Index Only Scan using idx_appointments_doctor_slot on appointments a  (cost=0.42..1.74 rows=1 width=16) (actual time=0.001..0.001 rows=2.01 loops=549)
+                    Index Cond: ((doctor_id = d.doctor_id) AND (slot_start = d.slot_start))
+                    Filter: ((status)::text <> 'CANCELLED'::text)
+                    Rows Removed by Filter: 0
+                    Heap Fetches: 92
+                    Index Searches: 549
+                    Buffers: shared hit=1743
+        ->  Index Only Scan using idx_appointments_doctor_slot on appointments b  (cost=0.42..0.50 rows=1 width=16) (actual time=0.001..0.001 rows=0.51 loops=1103)
+              Index Cond: ((doctor_id = a.doctor_id) AND (slot_start = a.slot_start))
+              Filter: (((status)::text <> 'CANCELLED'::text) AND (appointment_id > a.appointment_id))
+              Rows Removed by Filter: 2
+              Heap Fetches: 184
+              Index Searches: 1103
+              Buffers: shared hit=3500
+Planning:
+  Buffers: shared hit=473
+Planning Time: 0.766 ms
+Execution Time: 17.332 ms
+=== R24 run 4 ===
+Sort  (cost=15549.22..15549.22 rows=1 width=20) (actual time=17.462..17.472 rows=559.00 loops=1)
+  Sort Key: a.slot_start DESC
+  Sort Method: quicksort  Memory: 46kB
+  Buffers: shared hit=23500
+  CTE duplicate_slots
+    ->  GroupAggregate  (cost=0.42..5909.05 rows=5452 width=12) (actual time=0.032..15.815 rows=549.00 loops=1)
+          Group Key: appointments.doctor_id, appointments.slot_start
+          Filter: (count(*) > 1)
+          Rows Removed by Filter: 133997
+          Buffers: shared hit=18254
+          ->  Index Only Scan using idx_appointments_active_doctor_slot on appointments  (cost=0.42..4657.07 rows=139668 width=12) (actual time=0.004..7.485 rows=135100.00 loops=1)
+                Heap Fetches: 17881
+                Index Searches: 1
+                Buffers: shared hit=18254
+  ->  Nested Loop  (cost=0.84..9640.16 rows=1 width=20) (actual time=0.050..17.415 rows=559.00 loops=1)
+        Buffers: shared hit=23497
+        ->  Nested Loop  (cost=0.42..9632.07 rows=16 width=28) (actual time=0.046..16.739 rows=1103.00 loops=1)
+              Buffers: shared hit=19997
+              ->  CTE Scan on duplicate_slots d  (cost=0.00..109.04 rows=5452 width=12) (actual time=0.032..15.855 rows=549.00 loops=1)
+                    Storage: Memory  Maximum Storage: 38kB
+                    Buffers: shared hit=18254
+              ->  Index Only Scan using idx_appointments_doctor_slot on appointments a  (cost=0.42..1.74 rows=1 width=16) (actual time=0.001..0.001 rows=2.01 loops=549)
+                    Index Cond: ((doctor_id = d.doctor_id) AND (slot_start = d.slot_start))
+                    Filter: ((status)::text <> 'CANCELLED'::text)
+                    Rows Removed by Filter: 0
+                    Heap Fetches: 92
+                    Index Searches: 549
+                    Buffers: shared hit=1743
+        ->  Index Only Scan using idx_appointments_doctor_slot on appointments b  (cost=0.42..0.50 rows=1 width=16) (actual time=0.001..0.001 rows=0.51 loops=1103)
+              Index Cond: ((doctor_id = a.doctor_id) AND (slot_start = a.slot_start))
+              Filter: (((status)::text <> 'CANCELLED'::text) AND (appointment_id > a.appointment_id))
+              Rows Removed by Filter: 2
+              Heap Fetches: 184
+              Index Searches: 1103
+              Buffers: shared hit=3500
+Planning:
+  Buffers: shared hit=473
+Planning Time: 0.743 ms
+Execution Time: 17.506 ms
+=== R24 run 5 ===
+Sort  (cost=15549.22..15549.22 rows=1 width=20) (actual time=17.017..17.028 rows=559.00 loops=1)
+  Sort Key: a.slot_start DESC
+  Sort Method: quicksort  Memory: 46kB
+  Buffers: shared hit=23500
+  CTE duplicate_slots
+    ->  GroupAggregate  (cost=0.42..5909.05 rows=5452 width=12) (actual time=0.030..15.430 rows=549.00 loops=1)
+          Group Key: appointments.doctor_id, appointments.slot_start
+          Filter: (count(*) > 1)
+          Rows Removed by Filter: 133997
+          Buffers: shared hit=18254
+          ->  Index Only Scan using idx_appointments_active_doctor_slot on appointments  (cost=0.42..4657.07 rows=139668 width=12) (actual time=0.004..7.221 rows=135100.00 loops=1)
+                Heap Fetches: 17881
+                Index Searches: 1
+                Buffers: shared hit=18254
+  ->  Nested Loop  (cost=0.84..9640.16 rows=1 width=20) (actual time=0.044..16.970 rows=559.00 loops=1)
+        Buffers: shared hit=23497
+        ->  Nested Loop  (cost=0.42..9632.07 rows=16 width=28) (actual time=0.037..16.293 rows=1103.00 loops=1)
+              Buffers: shared hit=19997
+              ->  CTE Scan on duplicate_slots d  (cost=0.00..109.04 rows=5452 width=12) (actual time=0.031..15.469 rows=549.00 loops=1)
+                    Storage: Memory  Maximum Storage: 38kB
+                    Buffers: shared hit=18254
+              ->  Index Only Scan using idx_appointments_doctor_slot on appointments a  (cost=0.42..1.74 rows=1 width=16) (actual time=0.001..0.001 rows=2.01 loops=549)
+                    Index Cond: ((doctor_id = d.doctor_id) AND (slot_start = d.slot_start))
+                    Filter: ((status)::text <> 'CANCELLED'::text)
+                    Rows Removed by Filter: 0
+                    Heap Fetches: 92
+                    Index Searches: 549
+                    Buffers: shared hit=1743
+        ->  Index Only Scan using idx_appointments_doctor_slot on appointments b  (cost=0.42..0.50 rows=1 width=16) (actual time=0.001..0.001 rows=0.51 loops=1103)
+              Index Cond: ((doctor_id = a.doctor_id) AND (slot_start = a.slot_start))
+              Filter: (((status)::text <> 'CANCELLED'::text) AND (appointment_id > a.appointment_id))
+              Rows Removed by Filter: 2
+              Heap Fetches: 184
+              Index Searches: 1103
+              Buffers: shared hit=3500
+Planning:
+  Buffers: shared hit=473
+Planning Time: 0.710 ms
+Execution Time: 17.062 ms

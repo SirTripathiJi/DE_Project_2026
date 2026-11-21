@@ -1,6 +1,10 @@
 {
   "source_archive": "/Users/akshattripathi/Desktop/large_data.zip",
   "source_directory": "/Users/akshattripathi/Desktop/large_data",
+  "current_project_directory": "large_data/",
+  "relocated_into_project_on": "2026-11-21",
+  "archive_sha256": "972006a41c99725febce3c56adbe9f6c6af34e1b0e83cb4e92c1569f6306ac15",
+  "archive_members_byte_match_extracted": true,
   "verified_at": "2026-11-21",
   "csv_files": 11,
   "headers_match_seed": true,

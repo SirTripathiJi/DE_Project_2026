@@ -22,7 +22,7 @@ R20,READ,1.066,1.011,0.956,1.283,Index Only Scan using idx_appointments_complete
 R21,READ,0.094,0.047,0.046,0.279,Index Only Scan using idx_appointments_completed_pending_slot on appointments
 R22,READ,7.911,7.497,7.363,9.306,Index Only Scan using idx_appointments_slot_start on appointments
 R23,READ,0.084,0.021,0.020,0.338,Index Scan using doctors_registration_no_key on doctors
-R24,READ,22.223,22.015,21.947,22.771,Seq Scan on appointments
+R24,READ,17.945,17.506,17.062,20.282,Index Only Scan using idx_appointments_active_doctor_slot on appointments | Index Only Scan using idx_appointments_doctor_slot on appointments
 R25,READ,15.066,14.141,13.389,20.131,Index Only Scan using idx_appointments_completed_slot on appointments | Seq Scan on doctor_specializations
 W01,WRITE,0.834,0.736,0.712,1.215,Index Scan using pk_doctor_schedules on doctor_schedules | Index Scan using doctors_pkey on doctors
 W02,WRITE,0.245,0.226,0.213,0.336,Index Only Scan using idx_appointments_booked_slot on appointments | Index Scan using appointments_pkey on appointments

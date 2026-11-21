@@ -1,0 +1,150 @@
+=== R24 run 1 ===
+Gather Merge  (cost=20182.70..20202.07 rows=170 width=20) (actual time=20.939..21.954 rows=559.00 loops=1)
+  Workers Planned: 1
+  Workers Launched: 1
+  Buffers: shared hit=5448
+  ->  Sort  (cost=19182.69..19182.94 rows=100 width=20) (actual time=19.963..19.970 rows=279.50 loops=2)
+        Sort Key: a.slot_start DESC
+        Sort Method: quicksort  Memory: 35kB
+        Buffers: shared hit=5448
+        Worker 0:  Sort Method: quicksort  Memory: 36kB
+        ->  Parallel Hash Join  (cost=5015.83..19179.36 rows=100 width=20) (actual time=9.718..19.937 rows=279.50 loops=2)
+              Hash Cond: ((a.doctor_id = b.doctor_id) AND (a.slot_start = b.slot_start))
+              Join Filter: (b.appointment_id > a.appointment_id)
+              Rows Removed by Join Filter: 67830
+              Buffers: shared hit=5440
+              ->  Parallel Seq Scan on appointments a  (cost=0.00..3822.94 rows=79526 width=16) (actual time=0.003..4.180 rows=67550.00 loops=2)
+                    Filter: ((status)::text <> 'CANCELLED'::text)
+                    Rows Removed by Filter: 7450
+                    Buffers: shared hit=2720
+              ->  Parallel Hash  (cost=3822.94..3822.94 rows=79526 width=16) (actual time=9.598..9.599 rows=67550.00 loops=2)
+                    Buckets: 262144  Batches: 1  Memory Usage: 8416kB
+                    Buffers: shared hit=2720
+                    ->  Parallel Seq Scan on appointments b  (cost=0.00..3822.94 rows=79526 width=16) (actual time=0.003..5.551 rows=67550.00 loops=2)
+                          Filter: ((status)::text <> 'CANCELLED'::text)
+                          Rows Removed by Filter: 7450
+                          Buffers: shared hit=2720
+Planning:
+  Buffers: shared hit=531 read=2
+Planning Time: 1.033 ms
+Execution Time: 21.991 ms
+=== R24 run 2 ===
+Gather Merge  (cost=20182.70..20202.07 rows=170 width=20) (actual time=20.924..21.981 rows=559.00 loops=1)
+  Workers Planned: 1
+  Workers Launched: 1
+  Buffers: shared hit=5448
+  ->  Sort  (cost=19182.69..19182.94 rows=100 width=20) (actual time=19.987..19.995 rows=279.50 loops=2)
+        Sort Key: a.slot_start DESC
+        Sort Method: quicksort  Memory: 35kB
+        Buffers: shared hit=5448
+        Worker 0:  Sort Method: quicksort  Memory: 36kB
+        ->  Parallel Hash Join  (cost=5015.83..19179.36 rows=100 width=20) (actual time=9.537..19.958 rows=279.50 loops=2)
+              Hash Cond: ((a.doctor_id = b.doctor_id) AND (a.slot_start = b.slot_start))
+              Join Filter: (b.appointment_id > a.appointment_id)
+              Rows Removed by Join Filter: 67830
+              Buffers: shared hit=5440
+              ->  Parallel Seq Scan on appointments a  (cost=0.00..3822.94 rows=79526 width=16) (actual time=0.002..4.325 rows=67550.00 loops=2)
+                    Filter: ((status)::text <> 'CANCELLED'::text)
+                    Rows Removed by Filter: 7450
+                    Buffers: shared hit=2720
+              ->  Parallel Hash  (cost=3822.94..3822.94 rows=79526 width=16) (actual time=9.408..9.408 rows=67550.00 loops=2)
+                    Buckets: 262144  Batches: 1  Memory Usage: 8416kB
+                    Buffers: shared hit=2720
+                    ->  Parallel Seq Scan on appointments b  (cost=0.00..3822.94 rows=79526 width=16) (actual time=0.002..5.669 rows=67550.00 loops=2)
+                          Filter: ((status)::text <> 'CANCELLED'::text)
+                          Rows Removed by Filter: 7450
+                          Buffers: shared hit=2720
+Planning:
+  Buffers: shared hit=533
+Planning Time: 0.703 ms
+Execution Time: 22.015 ms
+=== R24 run 3 ===
+Gather Merge  (cost=20182.70..20202.07 rows=170 width=20) (actual time=21.665..22.731 rows=559.00 loops=1)
+  Workers Planned: 1
+  Workers Launched: 1
+  Buffers: shared hit=5448
+  ->  Sort  (cost=19182.69..19182.94 rows=100 width=20) (actual time=20.708..20.713 rows=279.50 loops=2)
+        Sort Key: a.slot_start DESC
+        Sort Method: quicksort  Memory: 35kB
+        Buffers: shared hit=5448
+        Worker 0:  Sort Method: quicksort  Memory: 35kB
+        ->  Parallel Hash Join  (cost=5015.83..19179.36 rows=100 width=20) (actual time=9.699..20.672 rows=279.50 loops=2)
+              Hash Cond: ((a.doctor_id = b.doctor_id) AND (a.slot_start = b.slot_start))
+              Join Filter: (b.appointment_id > a.appointment_id)
+              Rows Removed by Join Filter: 67830
+              Buffers: shared hit=5440
+              ->  Parallel Seq Scan on appointments a  (cost=0.00..3822.94 rows=79526 width=16) (actual time=0.002..4.278 rows=67550.00 loops=2)
+                    Filter: ((status)::text <> 'CANCELLED'::text)
+                    Rows Removed by Filter: 7450
+                    Buffers: shared hit=2720
+              ->  Parallel Hash  (cost=3822.94..3822.94 rows=79526 width=16) (actual time=9.578..9.578 rows=67550.00 loops=2)
+                    Buckets: 262144  Batches: 1  Memory Usage: 8416kB
+                    Buffers: shared hit=2720
+                    ->  Parallel Seq Scan on appointments b  (cost=0.00..3822.94 rows=79526 width=16) (actual time=0.002..5.575 rows=67550.00 loops=2)
+                          Filter: ((status)::text <> 'CANCELLED'::text)
+                          Rows Removed by Filter: 7450
+                          Buffers: shared hit=2720
+Planning:
+  Buffers: shared hit=533
+Planning Time: 0.717 ms
+Execution Time: 22.771 ms
+=== R24 run 4 ===
+Gather Merge  (cost=20182.70..20202.07 rows=170 width=20) (actual time=21.274..22.358 rows=559.00 loops=1)
+  Workers Planned: 1
+  Workers Launched: 1
+  Buffers: shared hit=5448
+  ->  Sort  (cost=19182.69..19182.94 rows=100 width=20) (actual time=20.340..20.346 rows=279.50 loops=2)
+        Sort Key: a.slot_start DESC
+        Sort Method: quicksort  Memory: 36kB
+        Buffers: shared hit=5448
+        Worker 0:  Sort Method: quicksort  Memory: 35kB
+        ->  Parallel Hash Join  (cost=5015.83..19179.36 rows=100 width=20) (actual time=9.843..20.310 rows=279.50 loops=2)
+              Hash Cond: ((a.doctor_id = b.doctor_id) AND (a.slot_start = b.slot_start))
+              Join Filter: (b.appointment_id > a.appointment_id)
+              Rows Removed by Join Filter: 67830
+              Buffers: shared hit=5440
+              ->  Parallel Seq Scan on appointments a  (cost=0.00..3822.94 rows=79526 width=16) (actual time=0.002..4.281 rows=67550.00 loops=2)
+                    Filter: ((status)::text <> 'CANCELLED'::text)
+                    Rows Removed by Filter: 7450
+                    Buffers: shared hit=2720
+              ->  Parallel Hash  (cost=3822.94..3822.94 rows=79526 width=16) (actual time=9.714..9.714 rows=67550.00 loops=2)
+                    Buckets: 262144  Batches: 1  Memory Usage: 8416kB
+                    Buffers: shared hit=2720
+                    ->  Parallel Seq Scan on appointments b  (cost=0.00..3822.94 rows=79526 width=16) (actual time=0.003..5.803 rows=67550.00 loops=2)
+                          Filter: ((status)::text <> 'CANCELLED'::text)
+                          Rows Removed by Filter: 7450
+                          Buffers: shared hit=2720
+Planning:
+  Buffers: shared hit=533
+Planning Time: 0.705 ms
+Execution Time: 22.393 ms
+=== R24 run 5 ===
+Gather Merge  (cost=20182.70..20202.07 rows=170 width=20) (actual time=20.832..21.912 rows=559.00 loops=1)
+  Workers Planned: 1
+  Workers Launched: 1
+  Buffers: shared hit=5448
+  ->  Sort  (cost=19182.69..19182.94 rows=100 width=20) (actual time=19.908..19.914 rows=279.50 loops=2)
+        Sort Key: a.slot_start DESC
+        Sort Method: quicksort  Memory: 36kB
+        Buffers: shared hit=5448
+        Worker 0:  Sort Method: quicksort  Memory: 35kB
+        ->  Parallel Hash Join  (cost=5015.83..19179.36 rows=100 width=20) (actual time=9.444..19.874 rows=279.50 loops=2)
+              Hash Cond: ((a.doctor_id = b.doctor_id) AND (a.slot_start = b.slot_start))
+              Join Filter: (b.appointment_id > a.appointment_id)
+              Rows Removed by Join Filter: 67830
+              Buffers: shared hit=5440
+              ->  Parallel Seq Scan on appointments a  (cost=0.00..3822.94 rows=79526 width=16) (actual time=0.003..4.264 rows=67550.00 loops=2)
+                    Filter: ((status)::text <> 'CANCELLED'::text)
+                    Rows Removed by Filter: 7450
+                    Buffers: shared hit=2720
+              ->  Parallel Hash  (cost=3822.94..3822.94 rows=79526 width=16) (actual time=9.307..9.307 rows=67550.00 loops=2)
+                    Buckets: 262144  Batches: 1  Memory Usage: 8416kB
+                    Buffers: shared hit=2720
+                    ->  Parallel Seq Scan on appointments b  (cost=0.00..3822.94 rows=79526 width=16) (actual time=0.002..5.495 rows=67550.00 loops=2)
+                          Filter: ((status)::text <> 'CANCELLED'::text)
+                          Rows Removed by Filter: 7450
+                          Buffers: shared hit=2720
+Planning:
+  Buffers: shared hit=533
+Planning Time: 0.645 ms
+Execution Time: 21.947 ms

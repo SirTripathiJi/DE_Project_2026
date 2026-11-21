@@ -1,0 +1,20 @@
+database_name,postgres_version,measured_at,table_name,index_name,index_bytes,table_bytes,index_pct_of_table
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.778153+05:30,appointments,idx_appointments_active_doctor_slot,4276224,23060480,18.544
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.778717+05:30,appointments,idx_appointments_booked_doctor_slot,114688,23060480,0.497
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.778753+05:30,appointments,idx_appointments_booked_slot,139264,23060480,0.604
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.778789+05:30,appointments,idx_appointments_completed_pending_slot,1236992,23060480,5.364
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.778827+05:30,appointments,idx_appointments_completed_slot,7168000,23060480,31.083
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.778862+05:30,appointments,idx_appointments_doctor_slot,13443072,23060480,58.295
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.7789+05:30,appointments,idx_appointments_noshow_slot,491520,23060480,2.131
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.778932+05:30,appointments,idx_appointments_patient_status_slot,12566528,23060480,54.494
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.77897+05:30,appointments,idx_appointments_slot_start,13344768,23060480,57.869
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.779008+05:30,appointments,idx_appointments_unfinished_slot_end,98304,23060480,0.426
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.779042+05:30,clinics,idx_clinics_city_clinic,57344,204800,28.000
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.779085+05:30,doctor_schedules,idx_schedules_clinic_id,212992,1875968,11.354
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.779251+05:30,doctor_schedules,idx_schedules_inclinic_doctor_weekday_start,1236992,1875968,65.939
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.779283+05:30,doctor_specializations,idx_doctor_specializations_primary_spec_doctor,90112,196608,45.833
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.779326+05:30,doctors,idx_doctors_languages_gin,24576,458752,5.357
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.779413+05:30,doctors,idx_doctors_verified_experience,155648,458752,33.929
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.779447+05:30,patients,idx_patients_allergies_gin,81920,4587520,1.786
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.779521+05:30,prescription_items,idx_prescription_items_medicine_trgm,7135232,18522112,38.523
+cp3_audit_opt_20261119,18.7 (Postgres.app),2026-11-21 21:41:26.780102+05:30,prescriptions,idx_prescriptions_follow_up_date,671744,7512064,8.942

@@ -127,6 +127,10 @@ def main() -> int:
     cp1_files = ["docs/01_problem_understanding.md", "docs/02_schema_design.md", "sql/01_schema.sql",
                  "sql/02_load_data.sql", "diagrams/er_diagram.png", "benchmarks/validate_seed.sql"]
     errors["CP1"].extend(f"required file missing: {p}" for p in cp1_files if not (ROOT / p).is_file())
+    problem_doc = (ROOT / "docs/01_problem_understanding.md").read_text(encoding="utf-8", errors="replace") if (ROOT / "docs/01_problem_understanding.md").is_file() else ""
+    problem_words = re.findall(r"\b[\w×–/-]+\b", problem_doc)
+    if len(problem_words) > 500:
+        errors["CP1"].append(f"problem-understanding document is {len(problem_words)} words; shorten it to fit the one-page limit")
     actual_seed: dict[str, int] = {}
     for table, expected in SEED_COUNTS.items():
         path = ROOT / "seed_data" / f"{table}.csv"
@@ -145,8 +149,13 @@ def main() -> int:
         facts["database"] = output.strip()
         if not ok: errors["CP1"].append("fresh-database seed validator failed")
     else:
-        evidence = ROOT / "benchmarks/results/seed_validation/validation_run.txt"
-        if not evidence.is_file() or "PASS" not in evidence.read_text(encoding="utf-8", errors="replace"):
+        evidence_candidates = [
+            ROOT / "benchmarks/results/seed_validation/validation_run.txt",
+            ROOT / "benchmarks/results/seed_validation/cp1_fresh_validation.txt",
+            ROOT / "benchmarks/results/seed_validation/cp1_verified_20261119.txt",
+        ]
+        if not any(path.is_file() and "PASS" in path.read_text(encoding="utf-8", errors="replace")
+                   for path in evidence_candidates):
             errors["CP1"].append("no successful PostgreSQL seed validation evidence")
     facts["seed"] = f"{len(actual_seed)}/11 CSV row counts checked; total {sum(actual_seed.values()):,}"
 
@@ -179,13 +188,36 @@ def main() -> int:
     optimized_sql = (ROOT / "sql/06_optimized_queries.sql").read_text(encoding="utf-8", errors="replace")
     optimized_ids = re.findall(r"^--\s+@(R\d{2}|W\d{2})\b", optimized_sql, re.M)
     if set(optimized_ids) != set(IDS) or len(optimized_ids) != 30: errors["CP3"].append("optimized SQL markers are not exactly the 30 official queries")
-    equivalence = ROOT / "benchmarks/results/optimized/equivalence_check_stable_ties.txt"
+    r24_dir = ROOT / "benchmarks/results/optimized_r24_scale_fix_seed"
+    try:
+        with (r24_dir / "summary.csv").open(newline="", encoding="utf-8-sig") as handle:
+            r24_rows = list(csv.DictReader(handle))
+        r24_raw = (r24_dir / "R24.txt").read_text(encoding="utf-8", errors="replace")
+        r24_times = [float(value) for value in TIME_RE.findall(r24_raw)]
+        if (len(r24_rows) != 1 or r24_rows[0].get("query_id") != "R24" or len(r24_times) != 5
+                or abs(sum(r24_times) / 5 - float(r24_rows[0]["avg_ms"])) > 0.00051):
+            errors["CP3"].append("current R24 seed remeasurement does not reconcile to five raw runs")
+    except (OSError, csv.Error, KeyError, ValueError):
+        errors["CP3"].append("current R24 seed remeasurement or raw plans are missing/invalid")
+    try:
+        with (ROOT / "benchmarks/results/optimized/index_storage_detailed.csv").open(newline="", encoding="utf-8-sig") as handle:
+            index_sizes = list(csv.DictReader(handle))
+        if len(index_sizes) != 19 or len({row.get("index_name") for row in index_sizes}) != 19:
+            errors["CP3"].append("per-index storage evidence must contain all 19 workload indexes exactly once")
+        for row in index_sizes:
+            index_bytes, table_bytes = int(row["index_bytes"]), int(row["table_bytes"])
+            observed_pct = float(row["index_pct_of_table"])
+            if index_bytes <= 0 or table_bytes <= 0 or abs(observed_pct - index_bytes * 100 / table_bytes) > 0.001:
+                errors["CP3"].append(f"per-index storage ratio is invalid for {row.get('index_name')}")
+    except (OSError, csv.Error, KeyError, ValueError):
+        errors["CP3"].append("per-index storage evidence is missing or invalid")
+    equivalence = ROOT / "benchmarks/results/optimized/equivalence_check_20261121.txt"
     if not equivalence.is_file():
         errors["CP3"].append("actual deterministic changed-query equivalence evidence is missing")
     else:
         equivalence_text = equivalence.read_text(encoding="utf-8", errors="replace")
-        if "Changed read queries checked: 10" not in equivalence_text:
-            errors["CP3"].append("equivalence evidence does not cover all ten changed reads")
+        if "Changed read queries checked: 11" not in equivalence_text:
+            errors["CP3"].append("equivalence evidence does not cover all eleven changed reads")
         if "Strict result-preservation failures (excluding the intended R13 correction): none" not in equivalence_text:
             errors["CP3"].append("equivalence evidence has strict result-preservation failures")
         for qid in ("R18", "R21", "R22"):
@@ -196,10 +228,11 @@ def main() -> int:
         if phrase.lower() not in opt_doc.lower(): errors["CP3"].append(f"optimization report missing {phrase}")
 
     # CP4: never mark as complete from seed evidence alone.
-    archive = ROOT / "large_data.zip"
     large_dir = ROOT / "large_data"
     large_summary = ROOT / "benchmarks/results/large/summary.csv"
-    if archive.is_file() and large_dir.is_dir() and large_summary.is_file():
+    # The faculty requires large_data/ in the project, but the archive and CSVs
+    # must stay out of Git. Do not require large_data.zip at the repository root.
+    if large_dir.is_dir() and large_summary.is_file():
         large_check = subprocess.run([sys.executable, str(ROOT / "benchmarks/validate_large.py")], cwd=ROOT, text=True, capture_output=True)
         if large_check.returncode:
             errors["CP4"].append("large-data artifacts exist but validate_large.py failed")
@@ -208,10 +241,14 @@ def main() -> int:
             facts["cp4"] = "large artifacts passed validator"
     else:
         facts["cp4"] = "BLOCKED: official faculty large_data.zip/results not present; seed data is not a substitute"
-    partition_evidence = ROOT / "benchmarks/results/partitioning/seed_pruning_validation.txt"
+    partition_evidence = ROOT / "benchmarks/results/large/partition_pruning.txt"
     if not (ROOT / "sql/08_partitioning.sql").is_file(): errors["CP4"].append("partitioning DDL missing")
-    if not partition_evidence.is_file() or "appointments_partitioned_2026_06" not in partition_evidence.read_text(encoding="utf-8", errors="replace"):
-        errors["CP4"].append("seed-only partition pruning plan evidence missing")
+    if not partition_evidence.is_file():
+        errors["CP4"].append("populated-data partition pruning plan evidence missing")
+    else:
+        plan = partition_evidence.read_text(encoding="utf-8", errors="replace")
+        if "appointments_partitioned_2026_06" not in plan or not re.search(r"actual time=.*rows=[1-9]\d*", plan):
+            errors["CP4"].append("partition pruning evidence does not show rows read from the populated June partition")
 
     # CP5: prep material is not the in-class individual assessment.
     cp5 = ROOT / "CP5_REVISION_NOTES.md"
@@ -230,18 +267,18 @@ def main() -> int:
     }
     marks = {"CP1": "7", "CP2": "3", "CP3": "16", "CP4": "14", "CP5": "Individual"}
     missing = {
-        "CP0": "Instructor/repository tracker confirmation.",
-        "CP1": "No material technical gap found in tested seed setup.",
-        "CP2": "No material timing-artifact gap found after correcting the report.",
-        "CP3": "Large-data behavior is CP4; CP3 seed evidence and rewrites are verified.",
-        "CP4": "Official large dataset, large query runs, growth/target results, large storage and scale-only fixes.",
+        "CP0": "No scored CP0 requirement remains in this local audit.",
+        "CP1": "No known missing CP1 requirement after the one-page and seed validations.",
+        "CP2": "No known missing CP2 timing artifact.",
+        "CP3": "R21/R22 literal tie-boundary membership remains undefined; write-overhead comparison does not isolate index cost.",
+        "CP4": "Replica, cache and shard effects are architecture recommendations, not separately measured experiments.",
         "CP5": "In-class individual analysis and instructor evaluation remain outstanding.",
     }
     audit = [
         "# Final Project Audit — Practo DBMS", "",
         f"Audit date: {date.today().isoformat()}. This report distinguishes recorded artifacts from checks executed in the isolated validation databases.", "",
-        f"Repository: {facts.get('git','unverified')}", "",
-        "| Checkpoint | Teacher marks | Verified status | Missing evidence |", "|---|---:|---|---|",
+        f"Audit starting point: {facts.get('git','unverified')}", "",
+        "| Checkpoint | Teacher marks | Verified status | Remaining limitation / evidence |", "|---|---:|---|---|",
     ]
     for cp in ("CP0", "CP1", "CP2", "CP3", "CP4", "CP5"):
         audit.append(f"| {cp} | {marks.get(cp,'—')} | {statuses[cp]} | {missing[cp]} |")
@@ -249,17 +286,23 @@ def main() -> int:
               f"- Seed CSV profile: {facts.get('seed','not checked')}.",
               "- PostgreSQL 18.7: fresh project-local seed schema/load passed; row-count and four cross-table checks are captured in `benchmarks/results/seed_validation/validation_run.txt`.",
               "- CP2: every baseline query has 3 raw timings; summary averages reconcile to raw plans and the corrected report table.",
-              "- CP3: every optimized query has 5 raw timings; averages reconcile to raw plans; 8 changed reads were compared on the fresh seed DB; R13's NULL fix and R18's tie-order limitation are recorded.",
+              "- CP3: every optimized query has 5 raw timings; averages reconcile to raw plans; all 11 changed reads were compared on the seed validation databases; R13's NULL correction and deterministic tie-order handling are recorded.",
               "- CP3 storage: measured table/index/database bytes are recorded in `docs/04_optimization_report.md` and `docs/05_scalability_report.md`.",
-              "- Partition DDL: applied in a separate seed validation database; static EXPLAIN selected the June 2026 partition only. This is not a large-data performance test.",
+              "- CP4 partitioning: populated appointment data was partitioned and EXPLAIN shows pruning to the June 2026 partition; the experiment and storage comparison are recorded under `benchmarks/results/large/`.",
               f"- CP4: {facts.get('cp4','not checked')}.",
               "- CP5: revision notes are preparation only; no individual assessment is claimed.", "",
               "## Validation issues", ""]
-    all_errors = [(cp, issue) for cp, issues in errors.items() for issue in issues]
+    # CP5 is the separate in-class individual assessment, not part of this
+    # repository's CP0–CP4 /40 submission check. Keep its status visible but
+    # do not make its pending individual exam fail repository validation.
+    all_errors = [(cp, issue) for cp in ("CP0", "CP1", "CP2", "CP3", "CP4") for issue in errors[cp]]
     if all_errors:
         audit += [f"- **{cp}:** {issue}" for cp, issue in all_errors]
     else:
-        audit.append("No failures in the available local checks. CP4 is still blocked by the missing official faculty dataset.")
+        audit.append("No failures in the available CP0–CP4 repository checks.")
+    if errors["CP5"]:
+        audit += ["", "## Outside this repository submission", "",
+                  "CP5 is the separate in-class individual assessment and remains pending; it is not included in the CP0–CP4 /40 repository validation."]
     audit += ["", "Marks are awarded by the instructor; this audit does not guarantee marks.", ""]
     output = "\n".join(audit)
     print(output)
