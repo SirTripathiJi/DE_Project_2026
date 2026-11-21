@@ -205,7 +205,7 @@ WHERE d.languages @> ARRAY['Tamil']
       WHERE sc.doctor_id = d.doctor_id
         AND c.city_id = 5
   )
-ORDER BY d.consultation_fee;
+ORDER BY d.consultation_fee, d.doctor_id;
 
 -- @R19
 -- City report: June 2026 completed consultations and latest consultation of every doctor with a Bengaluru clinic
@@ -251,14 +251,14 @@ ORDER BY day;
 SELECT appointment_id, patient_id, clinic_id, fee, slot_start
 FROM appointments
 WHERE status = 'COMPLETED' AND payment_status = 'PENDING'
-ORDER BY slot_start DESC
+ORDER BY slot_start DESC, appointment_id ASC
 LIMIT 100;
 
 -- @R22
 -- Support console: all appointments, newest first, page 4,001 (25 per page)
 SELECT appointment_id, patient_id, doctor_id, status, slot_start
 FROM appointments
-ORDER BY slot_start DESC
+ORDER BY slot_start DESC, appointment_id ASC
 OFFSET 100000
 LIMIT 25;
 

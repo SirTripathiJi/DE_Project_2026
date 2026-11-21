@@ -24,10 +24,10 @@
 
 | Role | Name | Enrollment No. | GitHub Username |
 |------|------|----------------|-----------------|
-| Group Lead | Akshat Tripathi | YOUR_ENROLLMENT_NO | SirTripathiJi |
-| Member 2 | Bhavya Bansal | ENROLLMENT_NO | GITHUB_USERNAME |
-| Member 3 | Shivansh Boora | ENROLLMENT_NO | GITHUB_USERNAME |
-| Member 4 | Parag Garg | ENROLLMENT_NO | GITHUB_USERNAME |
+| Group Lead | Akshat Tripathi | 2501010584 | SirTripathiJi |
+| Member 2 | Bhavya Bansal | 2501010115 | bhavyabansal2811 |
+| Member 3 | Shivansh Boora | 2501010431 | ArdentRug |
+| Member 4 | Parag Garg | 2501010318 | gargparag712-ship-it |
 
 **Team No.:** T0035 · **Section:** E · **Repository URL:** https://github.com/SirTripathiJi/DE_Project_2026
 

@@ -1,45 +1,45 @@
 === R06 run 1 ===
-Index Scan using patients_phone_key on patients  (cost=0.29..8.31 rows=1 width=23) (actual time=0.008..0.009 rows=1.00 loops=1)
+Index Scan using patients_phone_key on patients  (cost=0.29..8.31 rows=1 width=23) (actual time=0.025..0.025 rows=1.00 loops=1)
   Index Cond: ((phone)::text = '9400000090'::text)
   Index Searches: 1
-  Buffers: shared hit=3
+  Buffers: shared read=3
 Planning:
   Buffers: shared hit=125
-Planning Time: 0.243 ms
-Execution Time: 0.023 ms
+Planning Time: 0.211 ms
+Execution Time: 0.039 ms
 === R06 run 2 ===
-Index Scan using patients_phone_key on patients  (cost=0.29..8.31 rows=1 width=23) (actual time=0.008..0.008 rows=1.00 loops=1)
+Index Scan using patients_phone_key on patients  (cost=0.29..8.31 rows=1 width=23) (actual time=0.005..0.005 rows=1.00 loops=1)
   Index Cond: ((phone)::text = '9400000090'::text)
   Index Searches: 1
   Buffers: shared hit=3
 Planning:
   Buffers: shared hit=125
-Planning Time: 0.246 ms
-Execution Time: 0.023 ms
+Planning Time: 0.208 ms
+Execution Time: 0.019 ms
 === R06 run 3 ===
-Index Scan using patients_phone_key on patients  (cost=0.29..8.31 rows=1 width=23) (actual time=0.008..0.008 rows=1.00 loops=1)
+Index Scan using patients_phone_key on patients  (cost=0.29..8.31 rows=1 width=23) (actual time=0.005..0.005 rows=1.00 loops=1)
   Index Cond: ((phone)::text = '9400000090'::text)
   Index Searches: 1
   Buffers: shared hit=3
 Planning:
   Buffers: shared hit=125
-Planning Time: 0.233 ms
-Execution Time: 0.023 ms
+Planning Time: 0.195 ms
+Execution Time: 0.019 ms
 === R06 run 4 ===
-Index Scan using patients_phone_key on patients  (cost=0.29..8.31 rows=1 width=23) (actual time=0.008..0.008 rows=1.00 loops=1)
+Index Scan using patients_phone_key on patients  (cost=0.29..8.31 rows=1 width=23) (actual time=0.005..0.005 rows=1.00 loops=1)
   Index Cond: ((phone)::text = '9400000090'::text)
   Index Searches: 1
   Buffers: shared hit=3
 Planning:
   Buffers: shared hit=125
-Planning Time: 0.232 ms
-Execution Time: 0.021 ms
+Planning Time: 0.196 ms
+Execution Time: 0.017 ms
 === R06 run 5 ===
-Index Scan using patients_phone_key on patients  (cost=0.29..8.31 rows=1 width=23) (actual time=0.008..0.008 rows=1.00 loops=1)
+Index Scan using patients_phone_key on patients  (cost=0.29..8.31 rows=1 width=23) (actual time=0.005..0.005 rows=1.00 loops=1)
   Index Cond: ((phone)::text = '9400000090'::text)
   Index Searches: 1
   Buffers: shared hit=3
 Planning:
   Buffers: shared hit=125
-Planning Time: 0.229 ms
-Execution Time: 0.022 ms
+Planning Time: 0.197 ms
+Execution Time: 0.018 ms

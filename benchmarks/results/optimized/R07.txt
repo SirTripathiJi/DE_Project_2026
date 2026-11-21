@@ -1,24 +1,24 @@
 === R07 run 1 ===
-Sort  (cost=20.32..20.33 rows=2 width=60) (actual time=0.029..0.029 rows=2.00 loops=1)
+Sort  (cost=20.32..20.33 rows=2 width=60) (actual time=0.027..0.027 rows=2.00 loops=1)
   Sort Key: i.line_no
   Sort Method: quicksort  Memory: 25kB
-  Buffers: shared hit=12 dirtied=1
-  ->  Nested Loop  (cost=0.71..20.31 rows=2 width=60) (actual time=0.010..0.022 rows=2.00 loops=1)
-        Buffers: shared hit=9 dirtied=1
-        ->  Index Scan using prescriptions_appointment_id_key on prescriptions p  (cost=0.29..8.31 rows=1 width=22) (actual time=0.004..0.016 rows=1.00 loops=1)
+  Buffers: shared hit=5 read=5
+  ->  Nested Loop  (cost=0.71..20.31 rows=2 width=60) (actual time=0.020..0.020 rows=2.00 loops=1)
+        Buffers: shared hit=2 read=5
+        ->  Index Scan using prescriptions_appointment_id_key on prescriptions p  (cost=0.29..8.31 rows=1 width=22) (actual time=0.010..0.010 rows=1.00 loops=1)
               Index Cond: (appointment_id = 18872)
               Index Searches: 1
-              Buffers: shared hit=5 dirtied=1
-        ->  Index Scan using pk_prescription_items on prescription_items i  (cost=0.42..11.97 rows=3 width=46) (actual time=0.004..0.005 rows=2.00 loops=1)
+              Buffers: shared read=3
+        ->  Index Scan using pk_prescription_items on prescription_items i  (cost=0.42..11.97 rows=3 width=46) (actual time=0.008..0.008 rows=2.00 loops=1)
               Index Cond: (prescription_id = p.prescription_id)
               Index Searches: 1
-              Buffers: shared hit=4
+              Buffers: shared hit=2 read=2
 Planning:
-  Buffers: shared hit=200
-Planning Time: 0.477 ms
-Execution Time: 0.053 ms
+  Buffers: shared hit=183 read=16
+Planning Time: 0.706 ms
+Execution Time: 0.056 ms
 === R07 run 2 ===
-Sort  (cost=20.32..20.33 rows=2 width=60) (actual time=0.017..0.017 rows=2.00 loops=1)
+Sort  (cost=20.32..20.33 rows=2 width=60) (actual time=0.017..0.018 rows=2.00 loops=1)
   Sort Key: i.line_no
   Sort Method: quicksort  Memory: 25kB
   Buffers: shared hit=10
@@ -28,58 +28,58 @@ Sort  (cost=20.32..20.33 rows=2 width=60) (actual time=0.017..0.017 rows=2.00 lo
               Index Cond: (appointment_id = 18872)
               Index Searches: 1
               Buffers: shared hit=3
-        ->  Index Scan using pk_prescription_items on prescription_items i  (cost=0.42..11.97 rows=3 width=46) (actual time=0.004..0.005 rows=2.00 loops=1)
+        ->  Index Scan using pk_prescription_items on prescription_items i  (cost=0.42..11.97 rows=3 width=46) (actual time=0.005..0.005 rows=2.00 loops=1)
               Index Cond: (prescription_id = p.prescription_id)
               Index Searches: 1
               Buffers: shared hit=4
 Planning:
-  Buffers: shared hit=200
-Planning Time: 0.401 ms
+  Buffers: shared hit=199
+Planning Time: 0.365 ms
 Execution Time: 0.041 ms
 === R07 run 3 ===
-Sort  (cost=20.32..20.33 rows=2 width=60) (actual time=0.015..0.016 rows=2.00 loops=1)
+Sort  (cost=20.32..20.33 rows=2 width=60) (actual time=0.018..0.018 rows=2.00 loops=1)
   Sort Key: i.line_no
   Sort Method: quicksort  Memory: 25kB
   Buffers: shared hit=10
-  ->  Nested Loop  (cost=0.71..20.31 rows=2 width=60) (actual time=0.008..0.009 rows=2.00 loops=1)
-        Buffers: shared hit=7
-        ->  Index Scan using prescriptions_appointment_id_key on prescriptions p  (cost=0.29..8.31 rows=1 width=22) (actual time=0.003..0.003 rows=1.00 loops=1)
-              Index Cond: (appointment_id = 18872)
-              Index Searches: 1
-              Buffers: shared hit=3
-        ->  Index Scan using pk_prescription_items on prescription_items i  (cost=0.42..11.97 rows=3 width=46) (actual time=0.004..0.004 rows=2.00 loops=1)
-              Index Cond: (prescription_id = p.prescription_id)
-              Index Searches: 1
-              Buffers: shared hit=4
-Planning:
-  Buffers: shared hit=200
-Planning Time: 0.386 ms
-Execution Time: 0.038 ms
-=== R07 run 4 ===
-Sort  (cost=20.32..20.33 rows=2 width=60) (actual time=0.015..0.016 rows=2.00 loops=1)
-  Sort Key: i.line_no
-  Sort Method: quicksort  Memory: 25kB
-  Buffers: shared hit=10
-  ->  Nested Loop  (cost=0.71..20.31 rows=2 width=60) (actual time=0.009..0.010 rows=2.00 loops=1)
+  ->  Nested Loop  (cost=0.71..20.31 rows=2 width=60) (actual time=0.011..0.011 rows=2.00 loops=1)
         Buffers: shared hit=7
         ->  Index Scan using prescriptions_appointment_id_key on prescriptions p  (cost=0.29..8.31 rows=1 width=22) (actual time=0.004..0.004 rows=1.00 loops=1)
               Index Cond: (appointment_id = 18872)
               Index Searches: 1
               Buffers: shared hit=3
-        ->  Index Scan using pk_prescription_items on prescription_items i  (cost=0.42..11.97 rows=3 width=46) (actual time=0.004..0.004 rows=2.00 loops=1)
+        ->  Index Scan using pk_prescription_items on prescription_items i  (cost=0.42..11.97 rows=3 width=46) (actual time=0.005..0.005 rows=2.00 loops=1)
               Index Cond: (prescription_id = p.prescription_id)
               Index Searches: 1
               Buffers: shared hit=4
 Planning:
-  Buffers: shared hit=200
-Planning Time: 0.396 ms
-Execution Time: 0.038 ms
+  Buffers: shared hit=199
+Planning Time: 0.370 ms
+Execution Time: 0.043 ms
+=== R07 run 4 ===
+Sort  (cost=20.32..20.33 rows=2 width=60) (actual time=0.018..0.018 rows=2.00 loops=1)
+  Sort Key: i.line_no
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=10
+  ->  Nested Loop  (cost=0.71..20.31 rows=2 width=60) (actual time=0.010..0.010 rows=2.00 loops=1)
+        Buffers: shared hit=7
+        ->  Index Scan using prescriptions_appointment_id_key on prescriptions p  (cost=0.29..8.31 rows=1 width=22) (actual time=0.004..0.004 rows=1.00 loops=1)
+              Index Cond: (appointment_id = 18872)
+              Index Searches: 1
+              Buffers: shared hit=3
+        ->  Index Scan using pk_prescription_items on prescription_items i  (cost=0.42..11.97 rows=3 width=46) (actual time=0.005..0.005 rows=2.00 loops=1)
+              Index Cond: (prescription_id = p.prescription_id)
+              Index Searches: 1
+              Buffers: shared hit=4
+Planning:
+  Buffers: shared hit=199
+Planning Time: 0.373 ms
+Execution Time: 0.044 ms
 === R07 run 5 ===
 Sort  (cost=20.32..20.33 rows=2 width=60) (actual time=0.016..0.016 rows=2.00 loops=1)
   Sort Key: i.line_no
   Sort Method: quicksort  Memory: 25kB
   Buffers: shared hit=10
-  ->  Nested Loop  (cost=0.71..20.31 rows=2 width=60) (actual time=0.009..0.010 rows=2.00 loops=1)
+  ->  Nested Loop  (cost=0.71..20.31 rows=2 width=60) (actual time=0.009..0.009 rows=2.00 loops=1)
         Buffers: shared hit=7
         ->  Index Scan using prescriptions_appointment_id_key on prescriptions p  (cost=0.29..8.31 rows=1 width=22) (actual time=0.004..0.004 rows=1.00 loops=1)
               Index Cond: (appointment_id = 18872)
@@ -90,6 +90,6 @@ Sort  (cost=20.32..20.33 rows=2 width=60) (actual time=0.016..0.016 rows=2.00 lo
               Index Searches: 1
               Buffers: shared hit=4
 Planning:
-  Buffers: shared hit=200
-Planning Time: 0.362 ms
-Execution Time: 0.037 ms
+  Buffers: shared hit=199
+Planning Time: 0.353 ms
+Execution Time: 0.040 ms

@@ -1,3 +1,27 @@
 seed_data/
 large_data/
+seed_data.zip
+large_data.zip
 .DS_Store
+
+# Local database clusters, dumps, credentials, and temporary validation files
+.cp4_validation/
+.cp4_backup_*/
+.project_audit_backup_*/
+*.dump
+*.pgdump
+*.backup
+*.bak
+*.sqlite
+*.sqlite3
+*.db
+*.log
+*.tmp
+*.swp
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+*.pem
+*.key

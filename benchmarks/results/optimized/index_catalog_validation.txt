@@ -1,0 +1,45 @@
+SET
+                   indexname                    | exists | valid |  size   | size_bytes 
+------------------------------------------------+--------+-------+---------+------------
+ idx_appointments_active_doctor_slot            | t      | t     | 4176 kB |    4276224
+ idx_appointments_booked_doctor_slot            | t      | t     | 112 kB  |     114688
+ idx_appointments_booked_slot                   | t      | t     | 136 kB  |     139264
+ idx_appointments_completed_pending_slot        | t      | t     | 1208 kB |    1236992
+ idx_appointments_completed_slot                | t      | t     | 7000 kB |    7168000
+ idx_appointments_doctor_slot                   | t      | t     | 13 MB   |   13443072
+ idx_appointments_noshow_slot                   | t      | t     | 480 kB  |     491520
+ idx_appointments_patient_status_slot           | t      | t     | 12 MB   |   12566528
+ idx_appointments_slot_start                    | t      | t     | 13 MB   |   13344768
+ idx_appointments_unfinished_slot_end           | t      | t     | 96 kB   |      98304
+ idx_clinics_city_clinic                        | t      | t     | 56 kB   |      57344
+ idx_doctor_specializations_primary_spec_doctor | t      | t     | 88 kB   |      90112
+ idx_doctors_languages_gin                      | t      | t     | 24 kB   |      24576
+ idx_doctors_verified_experience                | t      | t     | 152 kB  |     155648
+ idx_patients_allergies_gin                     | t      | t     | 80 kB   |      81920
+ idx_prescription_items_medicine_trgm           | t      | t     | 6968 kB |    7135232
+ idx_prescriptions_follow_up_date               | t      | t     | 656 kB  |     671744
+ idx_schedules_clinic_id                        | t      | t     | 208 kB  |     212992
+ idx_schedules_inclinic_doctor_weekday_start    | t      | t     | 1208 kB |    1236992
+(19 rows)
+
+DO
+       table_name       | table_bytes | all_index_bytes | table_size | all_index_size 
+------------------------+-------------+-----------------+------------+----------------
+ appointments           |    23060480 |        56303616 | 22 MB      | 54 MB
+ cities                 |        8192 |           32768 | 8192 bytes | 32 kB
+ clinics                |      204800 |          172032 | 200 kB     | 168 kB
+ doctor_reviews         |     2375680 |         1392640 | 2320 kB    | 1360 kB
+ doctor_schedules       |     1875968 |         2424832 | 1832 kB    | 2368 kB
+ doctor_specializations |      196608 |          286720 | 192 kB     | 280 kB
+ doctors                |      458752 |          425984 | 448 kB     | 416 kB
+ patients               |     4587520 |         4284416 | 4480 kB    | 4184 kB
+ prescription_items     |    18522112 |        12623872 | 18 MB      | 12 MB
+ prescriptions          |     7512064 |         5062656 | 7336 kB    | 4944 kB
+ specializations        |        8192 |           32768 | 8192 bytes | 32 kB
+(11 rows)
+
+ database_bytes | database_size 
+----------------+---------------
+      150566591 | 144 MB
+(1 row)
+

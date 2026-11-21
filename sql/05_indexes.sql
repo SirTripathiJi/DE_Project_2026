@@ -61,8 +61,8 @@ CREATE INDEX idx_appointments_active_doctor_slot
 -- newest-first pagination can use the B-tree. INCLUDE helps selected reporting
 -- aggregates where an index-only scan is possible.
 CREATE INDEX idx_appointments_slot_start
-    ON appointments (slot_start DESC)
-    INCLUDE (appointment_id, patient_id, doctor_id, clinic_id, consult_type,
+    ON appointments (slot_start DESC, appointment_id ASC)
+    INCLUDE (patient_id, doctor_id, clinic_id, consult_type,
              status, payment_status, fee, consult_ended_at);
 
 -- R04/R08/R09/R16/R17/R20 and W02/W04: common fixed-status date windows.
@@ -86,8 +86,8 @@ CREATE INDEX idx_appointments_noshow_slot
 
 -- R21: rare unpaid completed appointments, sorted newest slot first.
 CREATE INDEX idx_appointments_completed_pending_slot
-    ON appointments (slot_start DESC)
-    INCLUDE (appointment_id, patient_id, clinic_id, fee)
+    ON appointments (slot_start DESC, appointment_id ASC)
+    INCLUDE (patient_id, clinic_id, fee)
     WHERE status = 'COMPLETED' AND payment_status = 'PENDING';
 
 -- W04: scheduled appointments to transition when their slots have ended.

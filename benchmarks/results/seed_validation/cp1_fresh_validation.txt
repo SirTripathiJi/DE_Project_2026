@@ -1,0 +1,33 @@
+SET
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:31: NOTICE:  cities: 10 rows (PASS)
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:31: NOTICE:  specializations: 15 rows (PASS)
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:31: NOTICE:  doctors: 3000 rows (PASS)
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:31: NOTICE:  doctor_specializations: 3700 rows (PASS)
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:31: NOTICE:  clinics: 1500 rows (PASS)
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:31: NOTICE:  doctor_schedules: 30499 rows (PASS)
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:31: NOTICE:  patients: 40000 rows (PASS)
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:31: NOTICE:  appointments: 150000 rows (PASS)
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:31: NOTICE:  prescriptions: 97234 rows (PASS)
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:31: NOTICE:  prescription_items: 243085 rows (PASS)
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:31: NOTICE:  doctor_reviews: 30339 rows (PASS)
+DO
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:74: NOTICE:  consultation type / clinic consistency: PASS
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:74: NOTICE:  in-clinic doctor schedule consistency: PASS
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:74: NOTICE:  prescription lifecycle consistency: PASS
+psql:/Users/akshattripathi/Desktop/DBMS-Practo-Doctor-Appointments/benchmarks/validate_seed.sql:74: NOTICE:  exactly one primary specialization per doctor: PASS
+DO
+       table_name       | expected_count | actual_count | passed 
+------------------------+----------------+--------------+--------
+ appointments           |         150000 |       150000 | t
+ cities                 |             10 |           10 | t
+ clinics                |           1500 |         1500 | t
+ doctor_reviews         |          30339 |        30339 | t
+ doctor_schedules       |          30499 |        30499 | t
+ doctor_specializations |           3700 |         3700 | t
+ doctors                |           3000 |         3000 | t
+ patients               |          40000 |        40000 | t
+ prescription_items     |         243085 |       243085 | t
+ prescriptions          |          97234 |        97234 | t
+ specializations        |             15 |           15 | t
+(11 rows)
+

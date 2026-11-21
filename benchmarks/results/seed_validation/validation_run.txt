@@ -1,0 +1,18 @@
+SET
+DO
+DO
+       table_name       | expected_count | actual_count | passed 
+------------------------+----------------+--------------+--------
+ appointments           |         150000 |       150000 | t
+ cities                 |             10 |           10 | t
+ clinics                |           1500 |         1500 | t
+ doctor_reviews         |          30339 |        30339 | t
+ doctor_schedules       |          30499 |        30499 | t
+ doctor_specializations |           3700 |         3700 | t
+ doctors                |           3000 |         3000 | t
+ patients               |          40000 |        40000 | t
+ prescription_items     |         243085 |       243085 | t
+ prescriptions          |          97234 |        97234 | t
+ specializations        |             15 |           15 | t
+(11 rows)
+

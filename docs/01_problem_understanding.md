@@ -6,7 +6,7 @@
 
 Practo operates as a digital healthcare platform connecting patients, doctors and clinics through doctor discovery, appointment scheduling, consultations, prescriptions and patient feedback. Its database supports both operational activities—such as finding available doctors, booking appointments and managing clinic check-ins—and analytical activities, including patient safety monitoring, service quality measurement and financial reporting.
 
-The supplied production export contains **626,367 records across 11 datasets**, including 150,000 appointments, 40,000 patients, 3,000 doctors, 30,499 doctor schedules and 97,234 prescriptions. This data represents interconnected healthcare workflows rather than isolated records. Consequently, database performance, relationship integrity and reliable information retrieval are essential to the platform's operation.
+The supplied production export contains **599,382 records across 11 datasets**, including 150,000 appointments, 40,000 patients, 3,000 doctors, 30,499 doctor schedules and 97,234 prescriptions. This data represents interconnected healthcare workflows rather than isolated records. Consequently, database performance, relationship integrity and reliable information retrieval are essential to the platform's operation.
 
 The dataset also contains 243,085 prescription items, 30,339 doctor reviews, 3,700 doctor-specialization associations, 1,500 clinics, 10 cities and 15 medical specializations. These records provide the foundation for understanding relationships between patients, healthcare providers, medical services and appointment outcomes.
 

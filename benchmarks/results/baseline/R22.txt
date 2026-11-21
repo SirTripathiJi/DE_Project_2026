@@ -1,39 +1,39 @@
 === R22 run 1 ===
-Limit  (cost=20956.95..20957.01 rows=25 width=29) (actual time=30.522..30.524 rows=25.00 loops=1)
+Limit  (cost=20956.95..20957.01 rows=25 width=29) (actual time=32.497..32.504 rows=25.00 loops=1)
   Buffers: shared hit=2723, temp read=670 written=775
-  ->  Sort  (cost=20706.95..21081.95 rows=150000 width=29) (actual time=25.916..28.858 rows=100025.00 loops=1)
+  ->  Sort  (cost=20706.95..21081.95 rows=150000 width=29) (actual time=27.516..30.767 rows=100025.00 loops=1)
         Sort Key: slot_start DESC
         Sort Method: external merge  Disk: 6176kB
         Buffers: shared hit=2723, temp read=670 written=775
-        ->  Seq Scan on appointments  (cost=0.00..4220.00 rows=150000 width=29) (actual time=0.005..8.718 rows=150000.00 loops=1)
+        ->  Seq Scan on appointments  (cost=0.00..4220.00 rows=150000 width=29) (actual time=0.003..8.882 rows=150000.00 loops=1)
               Buffers: shared hit=2720
 Planning:
   Buffers: shared hit=88
-Planning Time: 0.160 ms
-Execution Time: 31.898 ms
+Planning Time: 0.148 ms
+Execution Time: 33.646 ms
 === R22 run 2 ===
-Limit  (cost=20956.95..20957.01 rows=25 width=29) (actual time=29.603..29.605 rows=25.00 loops=1)
+Limit  (cost=20956.95..20957.01 rows=25 width=29) (actual time=32.455..32.461 rows=25.00 loops=1)
   Buffers: shared hit=2723, temp read=670 written=775
-  ->  Sort  (cost=20706.95..21081.95 rows=150000 width=29) (actual time=24.916..27.930 rows=100025.00 loops=1)
+  ->  Sort  (cost=20706.95..21081.95 rows=150000 width=29) (actual time=27.570..30.743 rows=100025.00 loops=1)
         Sort Key: slot_start DESC
         Sort Method: external merge  Disk: 6176kB
         Buffers: shared hit=2723, temp read=670 written=775
-        ->  Seq Scan on appointments  (cost=0.00..4220.00 rows=150000 width=29) (actual time=0.005..8.601 rows=150000.00 loops=1)
+        ->  Seq Scan on appointments  (cost=0.00..4220.00 rows=150000 width=29) (actual time=0.003..9.529 rows=150000.00 loops=1)
               Buffers: shared hit=2720
 Planning:
   Buffers: shared hit=88
-Planning Time: 0.147 ms
-Execution Time: 30.700 ms
+Planning Time: 0.152 ms
+Execution Time: 33.579 ms
 === R22 run 3 ===
-Limit  (cost=20956.95..20957.01 rows=25 width=29) (actual time=29.290..29.292 rows=25.00 loops=1)
+Limit  (cost=20956.95..20957.01 rows=25 width=29) (actual time=32.843..32.845 rows=25.00 loops=1)
   Buffers: shared hit=2723, temp read=670 written=775
-  ->  Sort  (cost=20706.95..21081.95 rows=150000 width=29) (actual time=24.505..27.670 rows=100025.00 loops=1)
+  ->  Sort  (cost=20706.95..21081.95 rows=150000 width=29) (actual time=27.604..31.170 rows=100025.00 loops=1)
         Sort Key: slot_start DESC
         Sort Method: external merge  Disk: 6176kB
         Buffers: shared hit=2723, temp read=670 written=775
-        ->  Seq Scan on appointments  (cost=0.00..4220.00 rows=150000 width=29) (actual time=0.005..8.433 rows=150000.00 loops=1)
+        ->  Seq Scan on appointments  (cost=0.00..4220.00 rows=150000 width=29) (actual time=0.003..8.894 rows=150000.00 loops=1)
               Buffers: shared hit=2720
 Planning:
   Buffers: shared hit=88
-Planning Time: 0.169 ms
-Execution Time: 30.365 ms
+Planning Time: 0.144 ms
+Execution Time: 33.960 ms

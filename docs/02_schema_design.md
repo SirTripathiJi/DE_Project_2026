@@ -15,7 +15,7 @@ The design also considers the supplied 30-query workload. Column names and sourc
 
 #### 1.2 Dataset Profile
 
-The uploaded production export contains **626,367 records across 11 tables**.
+The uploaded production export contains **599,382 records across 11 tables**.
 
 | Table | Records | Columns | Purpose |
 |---|---:|---:|---|
@@ -30,7 +30,7 @@ The uploaded production export contains **626,367 records across 11 tables**.
 | prescriptions | 97,234 | 6 | Diagnoses and prescription records |
 | prescription_items | 243,085 | 6 | Individual medicines and dosage instructions |
 | doctor_reviews | 30,339 | 7 | Patient feedback and consultation ratings |
-| **Total** | **626,367** | **75** | **Complete source dataset** |
+| **Total** | **599,382** | **75** | **Complete source dataset** |
 
 The appointment records are central to the model. They connect patients, doctors and clinics and provide the foundation for consultation history, prescription retrieval, reviews, payment reporting and operational monitoring.
 
@@ -573,7 +573,7 @@ Additional UNIQUE constraints are applied to the candidate natural keys document
 - The schema deliberately does not impose a UNIQUE constraint on `(doctor_id, slot_start)` in appointments because the actual source contains active double-booking cases.
 - No constraint is added requiring `checked_in_at` to occur before `consult_started_at`, as the source data contains records violating that ordering.
 
-All proposed constraints must be implemented and tested against the actual CSV data before the schema is considered complete.
+The constraints listed above were implemented and tested against the official seed CSVs. Fresh PostgreSQL execution and load results are recorded in Section 16; the repeatable validator is `benchmarks/validate_seed.sql`.
 
 ---
 
@@ -1046,12 +1046,13 @@ The schema design is therefore the foundation for the next implementation stage.
 
 #### 16.1 Environment
 
-The database schema was implemented and tested using:
+The fresh CP1 validation was run on 18 November 2026 using an isolated database cluster stored inside the project folder. It did not use or overwrite the earlier CP2/CP3 database.
 
 - Database: PostgreSQL
-- PostgreSQL client: 18.3
-- PostgreSQL server: 18.6 (Postgres.app)
+- PostgreSQL client: 18.7
+- PostgreSQL server: 18.7 (Postgres.app; Apple Silicon)
 - Database schema: `practo`
+- Validation database: `cp1_validation` (project-local disposable cluster)
 
 #### 16.2 Schema Creation
 
@@ -1084,7 +1085,7 @@ All 11 CSV files were imported using PostgreSQL `\copy` commands in parent-to-ch
 | prescriptions | 97,234 | 97,234 |
 | prescription_items | 243,085 | 243,085 |
 | doctor_reviews | 30,339 | 30,339 |
-| **Total** | **626,367** | **626,367** |
+| **Total** | **599,382** | **599,382** |
 
 The `ANALYZE` command was executed after data loading to update PostgreSQL table statistics.
 
@@ -1094,22 +1095,24 @@ A SQL query using `COUNT(*)` was executed against all 11 tables.
 
 **Result:** Every actual table count matched its corresponding expected CSV record count.
 
-Total verified records: **626,367**
+Total verified records: **599,382**
 
 #### 16.5 Integrity Validation Results
 
-Three additional SQL integrity checks were executed.
+The following cross-table checks were executed against the loaded database.
 
 | Check | Validation result | Outcome |
 |---|---|---|
-| Primary specialization | 0 doctors without a primary specialization | PASS |
-| Appointment and clinic consistency | All 122,144 in-clinic appointments have clinic IDs; all 27,856 video appointments have NULL clinic IDs | PASS |
-| Appointment patient and doctor references | 0 missing patient references and 0 missing doctor references | PASS |
+| Primary specialization | 0 doctors without a primary specialization; 0 doctors with multiple primary specializations | PASS |
+| Consultation type and clinic | 0 rule violations; 122,144 in-clinic appointments have a clinic and 27,856 video appointments have NULL clinic IDs | PASS |
+| In-clinic appointment schedule match | 0 of 122,144 in-clinic appointments fall outside a matching doctor's weekday, clinic and schedule time | PASS |
+| Prescription lifecycle | 0 prescriptions reference an appointment whose status is not `COMPLETED` | PASS |
+| Foreign-key loading | All 11 CSVs loaded with the schema's 12 foreign-key constraints enabled; COPY completed without a referential-integrity error | PASS |
 
 #### 16.6 Implementation Conclusion
 
-The initial PostgreSQL implementation successfully created all 11 tables and imported all 626,367 source records.
+The fresh PostgreSQL implementation successfully created all 11 tables and imported all 599,382 source records.
 
 The expected and actual row counts matched across every table. All three executed integrity checks passed.
 
-The implementation establishes the baseline relational database for the next phase of the Practo project, including query execution and performance analysis.
+The complete actual validation results are listed in Section 16.5. The CP3 index script was subsequently applied to this isolated seed database for query-equivalence and storage checks; it did not change the CP2/CP3 benchmark databases.
