@@ -12,7 +12,7 @@ This report records the committed baseline benchmark evidence before the CP3 wor
 
 ## Baseline results
 
-| Query | Workload operation | Type | Run 1 (ms) | Run 2 (ms) | Run 3 (ms) | Average (ms) | Scan nodes in plan | Why the plan is slow or fast |
+| Query ID | Workload operation | Type | Run 1 | Run 2 | Run 3 | Average | Scan nodes in plan | Why the plan is slow or fast |
 |---|---|---|---:|---:|---:|---:|---|---|
 | R01 | Find a doctor: verified dermatologists practising in Bengaluru, most experienced first | READ | 2.570 | 1.258 | 1.154 | 1.661 | Seq Scan on doctor_specializations; Seq Scan on specializations; Index Scan using doctors_pkey on doctors; Index Scan using pk_doctor_schedules on doctor_schedules; Seq Scan on clinics | Joins doctor, specialization, schedule and clinic relations; sequential scans of small dimensions dominate this selective search. |
 | R02 | Doctor profile: doctor 217's weekly timetable with clinic names | READ | 0.184 | 0.213 | 0.185 | 0.194 | Index Scan using pk_doctor_schedules on doctor_schedules; Seq Scan on clinics | The doctor schedule primary key narrows the lookup to one doctor; the clinic table is small. |
