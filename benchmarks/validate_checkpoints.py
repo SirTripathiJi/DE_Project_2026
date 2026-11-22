@@ -165,18 +165,25 @@ def main() -> int:
     baseline_doc = (ROOT / "docs/03_baseline_timings.md").read_text(encoding="utf-8", errors="replace") if (ROOT / "docs/03_baseline_timings.md").is_file() else ""
     if not baseline_doc or "benchmarks/results/baseline/" not in baseline_doc or "results/before/" in baseline_doc:
         errors["CP2"].append("baseline report path/method is missing or points to the wrong evidence folder")
-    doc_rows = re.findall(r"^\| (R\d{2}|W\d{2}) \|", baseline_doc, re.M)
+    required_timing_header = "| Query ID | Run 1 | Run 2 | Run 3 | Average |"
+    if required_timing_header not in baseline_doc.splitlines():
+        errors["CP2"].append("baseline timing table must use the five required columns")
+    timing_table = baseline_doc.split(required_timing_header, 1)[1].split("\n## ", 1)[0] if required_timing_header in baseline_doc else ""
+    doc_rows = re.findall(r"^\| (R\d{2}|W\d{2}) \|", timing_table, re.M)
     if len(doc_rows) != 30 or set(doc_rows) != set(IDS): errors["CP2"].append("baseline report must list every query exactly once")
     else:
         try:
             with (ROOT / "benchmarks/results/baseline/summary.csv").open(newline="", encoding="utf-8-sig") as handle:
                 summary = {row["query_id"]: row for row in csv.DictReader(handle)}
-            for line in baseline_doc.splitlines():
+            for line in timing_table.splitlines():
                 parts = [part.strip() for part in line.strip().strip("|").split("|")]
                 if not parts or parts[0] not in IDS: continue
                 qid = parts[0]
                 times = [float(v) for v in TIME_RE.findall((ROOT / "benchmarks/results/baseline" / f"{qid}.txt").read_text())]
-                documented = [float(parts[i]) for i in (3, 4, 5, 6)]
+                if len(parts) != 5:
+                    errors["CP2"].append(f"baseline timing row for {qid} must have five columns")
+                    continue
+                documented = [float(parts[i]) for i in (1, 2, 3, 4)]
                 expected = [*times, float(summary[qid]["avg_ms"])]
                 if len(times) != 3 or any(round(a, 3) != round(b, 3) for a, b in zip(documented, expected)):
                     errors["CP2"].append(f"baseline report timings differ from raw plans for {qid}")
